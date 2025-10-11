@@ -49,19 +49,13 @@ Este repositorio contiene el código fuente del aplicativo "Blacklists".
 
 ### Ejemplo de petición para agregar un email a la lista negra global
 
-curl --location 'http://localhost:5001/blacklists' \
---header 'Authorization: Bearer token_valido' \
---header 'Content-Type: application/json' \
---data-raw '{
+```curl
+curl --location 'http://localhost:5001/blacklists' --header 'Authorization: Bearer token_valido' --header 'Content-Type: application/json' --data-raw '{
     "email": "ejemplo@gmail.com",
     "app_uuid": "66b00d93-26a8-4046-943c-e6c5b62e3be5",
     "blocked_reason": "Bloqueo de Ejemplo 1"
 }'
-
-
-### Pruebas y documentación Postman:
-
-https://documenter.getpostman.com/view/49159728/2sB3QKsq3t
+```
 
 ## 2. Consultar si un email está en la lista negra global o no
 
@@ -84,8 +78,13 @@ https://documenter.getpostman.com/view/49159728/2sB3QKsq3t
 |El email no se encuentra en la lista negra de la organización|200|<code>{"blacklist": false}</code>|
 |El email se encuentra en la lista negra de la organización|200|<code>{"blacklist": true}</code>|
 
-## Ejemplo de petición para consultar si un email está en la lista negra global o no
+### Ejemplo de petición para consultar si un email está en la lista negra global o no
 
+```curl
 curl --location 'http://localhost:5001/blacklists/ejemplo@gmail.com' \
 --header 'Authorization: Bearer token_valido'
+```
 
+## Pruebas y documentación Postman:
+
+https://documenter.getpostman.com/view/49159728/2sB3QKsq3t
