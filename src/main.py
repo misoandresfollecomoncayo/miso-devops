@@ -2,7 +2,8 @@ from datetime import datetime
 import re
 import uuid
 from flask import request, jsonify
-from app import create_app, db
+from app import create_app
+from database import db
 from models.blacklists import Blacklists
 
 app = create_app()
@@ -69,5 +70,33 @@ def blacklists():
         "status": "success"
     }), 200
 
+@app.route('/blacklists/<email>', methods=['GET'])
+def get_blacklist(email):
+    # Validar header de autorización
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({"error": "No hay token de autorización"}), 401
+
+    # Validar token válido
+    token = auth_header.split(" ")[1]
+    if token != "token_valido":
+        return jsonify({"error": "Token inválido"}), 403
+
+    # Validar formato email
+    if is_email(email) == False:
+        return jsonify({"error": "El parámetro email no es válido"}), 400
+
+    # Buscar email en la lista negra
+    bl = Blacklists.query.filter_by(email=email).first()
+    if not bl:
+        return jsonify({
+            "blacklist": False
+        }), 200
+
+    # Respuesta
+    return jsonify({
+        "blacklist": True
+    }), 200
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5001)

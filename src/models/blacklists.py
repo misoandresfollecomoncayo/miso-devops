@@ -1,6 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-
-from main import db
+from database import db
 
 class Blacklists(db.Model):
     __tablename__ = "blacklists"
