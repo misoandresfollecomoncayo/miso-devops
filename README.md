@@ -47,7 +47,7 @@ Este repositorio contiene el código fuente del aplicativo "Blacklists".
 |El formato del parámetro app_uuid no es válido|400|<code>{"error": "El parámetro app_uuid no es válido"}</code>|
 |El email fue agregado correctamente a la lista negra de la organización|200|<code>{"status": "success", "message": "El email fue agregado correctamente"}</code>|
 
-### Ejemplo de petición para agregar un email a la lista negra global
+### Ejemplo de petición para agregar un email a la lista negra global:
 
 ```curl
 curl --location 'http://localhost:5001/blacklists' --header 'Authorization: Bearer token_valido' --header 'Content-Type: application/json' --data-raw '{
@@ -78,13 +78,12 @@ curl --location 'http://localhost:5001/blacklists' --header 'Authorization: Bear
 |El email no se encuentra en la lista negra de la organización|200|<code>{"blacklist": false}</code>|
 |El email se encuentra en la lista negra de la organización|200|<code>{"blacklist": true}</code>|
 
-### Ejemplo de petición para consultar si un email está en la lista negra global o no
+### Ejemplo de petición para consultar si un email está en la lista negra global o no:
 
 ```curl
-curl --location 'http://localhost:5001/blacklists/ejemplo@gmail.com' \
---header 'Authorization: Bearer token_valido'
+curl --location 'http://localhost:5001/blacklists/ejemplo@gmail.com' --header 'Authorization: Bearer token_valido'
 ```
 
-## Pruebas y documentación Postman:
+# Pruebas y documentación Postman:
 
 https://documenter.getpostman.com/view/49159728/2sB3QKsq3t
