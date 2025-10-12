@@ -1,0 +1,3 @@
+variable "rolename" {
+    type = string
+}
