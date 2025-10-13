@@ -1,2 +1,14 @@
 src/__pycache__
 src/models/__pycache__
+
+
+# Local .terraform directories
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+crash.log
+
+
+.DS_Store
