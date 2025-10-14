@@ -3,19 +3,19 @@ src/models/__pycache__
 
 
 #terraform
-terraform/stacks/BeanstalkIAM/.terraform/*
+terraform/stacks/BeanstalkApp/.terraform/*
 terraform/stacks/s3/.terraform/*
 
 # Ignorar lock files de Terraform
-terraform/stacks/BeanstalkIAM/.terraform.lock.hcl
+terraform/stacks/BeanstalkApp/.terraform.lock.hcl
 terraform/stacks/s3/.terraform.lock.hcl
 
 # Ignorar carpetas .terraform
-terraform/stacks/BeanstalkIAM/.terraform/
+terraform/stacks/BeanstalkApp/.terraform/
 terraform/stacks/s3/.terraform/
 
 # Ignorar planes y estados de Terraform
-terraform/stacks/BeanstalkIAM/.tfplan
+terraform/stacks/BeanstalkApp/.tfplan
 terraform/stacks/s3/.tfplan
 
 # Ignorar tfstate y backup
