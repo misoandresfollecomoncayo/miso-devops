@@ -19,6 +19,11 @@ def is_email(value: str) -> bool:
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, value) is not None
 
+# Agregar health check
+@app.route('/ping', methods=['GET'])
+def health_check():
+    return "Ok", 200
+
 # Permite agregar un email a la lista negra global de la organización
 @app.route('/blacklists', methods=['POST'])
 def blacklists():
@@ -99,4 +104,4 @@ def get_blacklist(email):
     }), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=8000)

@@ -2,13 +2,22 @@ src/__pycache__
 src/models/__pycache__
 
 
-# Local .terraform directories
-.terraform/
-*.tfstate
-*.tfstate.*
-*.tfvars
-*.tfplan
-crash.log
+#terraform
+terraform/stacks/BeanstalkApp/.terraform/*
+terraform/stacks/s3/.terraform/*
 
+# Ignorar lock files de Terraform
+terraform/stacks/BeanstalkApp/.terraform.lock.hcl
+terraform/stacks/s3/.terraform.lock.hcl
 
-.DS_Store
+# Ignorar carpetas .terraform
+terraform/stacks/BeanstalkApp/.terraform/
+terraform/stacks/s3/.terraform/
+
+# Ignorar planes y estados de Terraform
+terraform/stacks/BeanstalkApp/.tfplan
+terraform/stacks/s3/.tfplan
+
+# Ignorar tfstate y backup
+terraform/stacks/s3/terraform.tfstate
+terraform/stacks/s3/terraform.tfstate.backup
