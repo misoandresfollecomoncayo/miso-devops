@@ -122,6 +122,24 @@ resource "aws_elastic_beanstalk_environment" "env" {
         value     = var.service_role
     }
 
+    setting {
+        namespace = "aws:elasticbeanstalk:command"
+        name      = "DeploymentPolicy"
+        value     = var.DeploymentPolicy 
+    }
+
+    setting {
+        namespace = "aws:autoscaling:asg"
+        name      = "MinSize"
+        value     = "3"
+    }
+
+    setting {
+        namespace = "aws:autoscaling:asg"
+        name      = "MaxSize"
+        value     = "6"
+    }
+
     # healthcheck y puerto (dependiendo de tu app)
     setting {
         namespace = "aws:elasticbeanstalk:application"

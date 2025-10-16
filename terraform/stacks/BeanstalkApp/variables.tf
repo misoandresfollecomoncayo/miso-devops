@@ -70,3 +70,7 @@ variable "username" {
 variable "password" {
     type = string
 }
+
+variable "DeploymentPolicy" {
+    type = string
+}

@@ -45,3 +45,7 @@ variable "password" {
 variable "db_host" {
     type = string
 }
+
+variable "DeploymentPolicy" {
+    type = string
+}
