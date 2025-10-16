@@ -52,4 +52,5 @@ module "beanstalk" {
     username = var.username
     password = var.password
     db_host = module.rds.db_host
+    DeploymentPolicy = var.DeploymentPolicy
 }

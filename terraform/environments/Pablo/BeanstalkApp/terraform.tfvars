@@ -13,3 +13,4 @@ identifier = "db-postgres-devops"
 db_name  = "dbdevops"
 username = "postgres"
 password = "postgres"
+DeploymentPolicy = "AllAtOnce" # Cambiar luego a AllAtOnce, Immutable, Rolling, RollingWithAdditionalBatch
