@@ -87,3 +87,7 @@ curl --location 'http://localhost:5001/blacklists/ejemplo@gmail.com' --header 'A
 # Pruebas y documentación Postman:
 
 https://documenter.getpostman.com/view/49159728/2sB3QKsq3t
+
+# Videos de las entregas
+
+* Entrega 1: https://drive.google.com/file/d/1zjUT5zi4UIbPUqDhEecvAmYlLivAYw3X/view?usp=sharing
