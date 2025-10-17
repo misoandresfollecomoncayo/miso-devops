@@ -86,7 +86,7 @@ curl --location 'http://localhost:5001/blacklists/ejemplo@gmail.com' --header 'A
 
 # Pruebas y documentación Postman:
 
-https://documenter.getpostman.com/view/49159728/2sB3QKsq3t
+https://www.postman.com/misoandresfollecomoncayo-9717669/miso-devops/collection/p0jwi82/blacklists-app?action=share&creator=49159728&active-environment=49309254-b538b677-b5fe-480d-8f2e-bd9e70bcd9aa
 
 # Videos de las entregas
 
