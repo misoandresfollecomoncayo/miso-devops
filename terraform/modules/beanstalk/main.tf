@@ -140,10 +140,19 @@ resource "aws_elastic_beanstalk_environment" "env" {
         value     = "6"
     }
 
+        # --- Forzar uso de Application Load Balancer (ALB) ---
+    setting {
+        namespace = "aws:elasticbeanstalk:environment"
+        name      = "LoadBalancerType"
+        value     = "application"
+    }
+
+
     # healthcheck y puerto (dependiendo de tu app)
     setting {
-        namespace = "aws:elasticbeanstalk:application"
-        name      = "Application Healthcheck URL"
+        namespace = "aws:elasticbeanstalk:environment:process:default"
+        name      = "HealthCheckPath"
         value     = "/ping"
     }
+
 }
