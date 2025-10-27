@@ -22,6 +22,7 @@ Este repositorio contiene el código fuente del aplicativo "Blacklists".
 - Flask
 - SQLAlchemy
 - PostgreSQL
+- pytest
 
 # Endpoints
 
