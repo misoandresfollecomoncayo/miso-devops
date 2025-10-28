@@ -1,3 +1,12 @@
+###########################################################
+# S3 para versiones
+###########################################################
+
+module "s3_bucket_for_versions" {
+    source = "../../modules/s3"
+    environment = var.environment
+    bucket_name = var.s3_bucket_for_versions
+}
 
 ###########################################################
 # IAM CodeBuild
@@ -31,5 +40,9 @@ module "codebuild_aws" {
     auth_github_token = module.secret_manager.secret_manager_value
     compute_type = var.compute_type
     aws_region = var.aws_region
-    bucket_versiones = var.bucket_versiones
+    bucket_versiones = module.s3_bucket_for_versions.bucket_name
+    db_name = var.db_name
+    db_host = var.db_host #Este es la salida de un modulo
+    username = var.username
+    password = var.password
 }

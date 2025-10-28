@@ -37,7 +37,32 @@ variable "source_version" {
     type = string
 }
 
-variable "bucket_versiones" {
-    type = string
-    default = "nose"
+variable "s3_bucket_for_versions" {
+    description = "Nombre del bucket S3"
+    type    = string
+    default = "beanstalk-versions-static"
 }
+
+variable "environment" {
+    description = "Ambiente del s3"
+    type = string
+}
+
+#No incluir
+
+variable "username" {
+    type = string
+}
+
+variable "password" {
+    type = string
+}
+
+variable "db_name" {
+    type = string
+}
+
+variable "db_host" {
+    type = string
+    default = "test"
+} 

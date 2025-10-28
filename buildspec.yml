@@ -16,6 +16,27 @@ phases:
       - echo Building the Docker image...
       - docker build -t $ECR_REPO_URI:$IMAGE_TAG .
       - docker tag $ECR_REPO_URI:$IMAGE_TAG $ECR_REPO_URI:$IMAGE_TAG
+      - cat > Dockerrun.aws.json <<EOF
+        {
+          "AWSEBDockerrunVersion": "1",
+          "Image": {
+            "Name": "$ECR_REPO_URI:$IMAGE_TAG",
+            "Update": "true"
+          },
+          "Ports": [
+            { "ContainerPort": "8000" }
+          ],
+          "Environment": [
+            { "Name": "DB_USER", "Value": "$DB_USER" },
+            { "Name": "DB_PASSWORD", "Value": "$DB_PASSWORD" },
+            { "Name": "DB_NAME", "Value": "$DB_NAME" },
+            { "Name": "DB_HOST", "Value": "$DB_HOST" }
+          ]
+        }
+        EOF
+      - NAME_ZIP="Dockerrun_${IMAGE_TAG}.zip"
+      - export NAME_ZIP
+      - zip -r NAME_ZIP Dockerrun.aws.json
 
   post_build:
     commands:
@@ -25,5 +46,5 @@ phases:
 
 artifacts:
   files:
-    - '**/*'
+    - 'NAME_ZIP'
   discard-paths: yes

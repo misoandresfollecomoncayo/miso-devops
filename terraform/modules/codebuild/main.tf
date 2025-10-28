@@ -25,25 +25,25 @@ resource "aws_codebuild_project" "docker_build" {
             value = var.ecr_repo_uri
         }
         
-        #environment_variable{ 
-        #    name =  "DB_USER"
-        #    value = "${var.username}"
-        #}
-        #
-        #environment_variable{ 
-        #    name =  "DB_PASSWORD"
-        #    value = "${var.password}"
-        #}
-        #
-        #environment_variable{ 
-        #    name =  "DB_NAME"
-        #    value = "${var.db_name}"
-        #}
-        #
-        #environment_variable{ 
-        #    name =  "DB_HOST"
-        #    value = "${var.db_host}"
-        #}   
+        environment_variable{ 
+            name =  "DB_USER"
+            value = var.username
+        }
+        
+        environment_variable{ 
+            name =  "DB_PASSWORD"
+            value = var.password
+        }
+        
+        environment_variable{ 
+            name =  "DB_NAME"
+            value = var.db_name
+        }
+        
+        environment_variable{ 
+            name =  "DB_HOST"
+            value = var.db_host
+        }   
     }  
 
 
