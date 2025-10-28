@@ -10,8 +10,8 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
-      - export REPO_URI=$ECR_REPO_URI
-      - echo Repo URI: $REPO_URI
+      - "export REPO_URI=$ECR_REPO_URI"
+      - echo "Repo URI: $REPO_URI"
 
   build:
     commands:
