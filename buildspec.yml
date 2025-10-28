@@ -16,7 +16,8 @@ phases:
       - echo Building the Docker image...
       - docker build -t $ECR_REPO_URI:$IMAGE_TAG .
       - docker tag $ECR_REPO_URI:$IMAGE_TAG $ECR_REPO_URI:$IMAGE_TAG
-      - cat > Dockerrun.aws.json <<EOF
+      - |
+        cat > Dockerrun.aws.json <<EOF
         {
           "AWSEBDockerrunVersion": "1",
           "Image": {
