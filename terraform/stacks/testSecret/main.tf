@@ -31,4 +31,5 @@ module "codebuild_aws" {
     auth_github_token = module.secret_manager.secret_manager_value
     compute_type = var.compute_type
     aws_region = var.aws_region
+    bucket_versiones = var.bucket_versiones
 }

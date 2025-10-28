@@ -36,3 +36,8 @@ variable "source_location" {
 variable "source_version" {
     type = string
 }
+
+variable "bucket_versiones" {
+    type = string
+    default = "nose"
+}
