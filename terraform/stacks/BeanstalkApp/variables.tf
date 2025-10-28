@@ -88,10 +88,6 @@ variable "compute_type" {
     type = string
 }
 
-variable "ecr_image_uri" {
-    type = string
-}
-
 variable "source_type" {
     type = string
 }

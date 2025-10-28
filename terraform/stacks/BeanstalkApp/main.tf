@@ -89,4 +89,8 @@ module "codebuild_aws" {
     compute_type = var.compute_type
     aws_region = var.aws_region
     bucket_versiones = module.s3_bucket_for_versions.bucket_name
+    db_name = var.db_name
+    db_host = module.rds.db_host
+    username = var.username
+    password = var.password
 }
