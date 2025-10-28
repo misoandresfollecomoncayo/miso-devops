@@ -9,14 +9,17 @@ terraform/stacks/s3/.terraform/*
 # Ignorar lock files de Terraform
 terraform/stacks/BeanstalkApp/.terraform.lock.hcl
 terraform/stacks/s3/.terraform.lock.hcl
+terraform/stacks/testSecret/.terraform.lock.hcl
 
 # Ignorar carpetas .terraform
 terraform/stacks/BeanstalkApp/.terraform/
 terraform/stacks/s3/.terraform/
+terraform/stacks/testSecret/.terraform/
 
 # Ignorar planes y estados de Terraform
 terraform/stacks/BeanstalkApp/.tfplan
 terraform/stacks/s3/.tfplan
+terraform/stacks/testSecret/.tfplan
 
 # Ignorar tfstate y backup
 terraform/stacks/s3/terraform.tfstate

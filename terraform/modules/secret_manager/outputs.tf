@@ -1,4 +1,4 @@
 output "secret_manager_value" {
-    value = aws_secretsmanager_secret_version.github-pat-value.secret_string
+    value = aws_codebuild_source_credential.github.arn
     sensitive = true
 }

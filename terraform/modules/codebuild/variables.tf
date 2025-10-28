@@ -24,7 +24,6 @@ variable "source_location" {
 
 variable "auth_github_token" {
     type = string
-    sensitive = true
 }
 
 variable "aws_region" {

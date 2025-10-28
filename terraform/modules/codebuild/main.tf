@@ -15,15 +15,36 @@ resource "aws_codebuild_project" "docker_build" {
         image_pull_credentials_type = "CODEBUILD"
 
         environment_variable {
-        name  = "AWS_DEFAULT_REGION"
-        value = var.aws_region
+            name  = "AWS_DEFAULT_REGION"
+            value = var.aws_region
         }
 
         environment_variable {
-        name  = "ECR_REPO_URI"
-        value = var.ecr_repo_uri
+            name  = "ECR_REPO_URI"
+            value = var.ecr_repo_uri
         }
-    }
+        
+        #environment_variable{ 
+        #    name =  "DB_USER"
+        #    value = "${var.username}"
+        #}
+        #
+        #environment_variable{ 
+        #    name =  "DB_PASSWORD"
+        #    value = "${var.password}"
+        #}
+        #
+        #environment_variable{ 
+        #    name =  "DB_NAME"
+        #    value = "${var.db_name}"
+        #}
+        #
+        #environment_variable{ 
+        #    name =  "DB_HOST"
+        #    value = "${var.db_host}"
+        #}   
+    }  
+
 
     source {
         type      = var.source_type
@@ -32,7 +53,7 @@ resource "aws_codebuild_project" "docker_build" {
         git_clone_depth = 1
 
         git_submodules_config {
-            fetch_submodules = 1
+            fetch_submodules = true
         }
 
         auth {

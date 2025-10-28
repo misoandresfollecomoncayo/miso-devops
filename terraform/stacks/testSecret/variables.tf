@@ -12,3 +12,27 @@ variable "personal-access-token-github" {
     type = string
     sensitive = true
 }
+
+variable "build_name" {
+    type = string
+}
+
+variable "compute_type" {
+    type = string
+}
+
+variable "ecr_repo_uri" {
+    type = string
+}
+
+variable "source_type" {
+    type = string
+}
+
+variable "source_location" {
+    type = string
+}
+
+variable "source_version" {
+    type = string
+}

@@ -19,3 +19,16 @@ module "secret_manager" {
 ###########################################################
 # Codebuild project configuration
 ###########################################################
+
+module "codebuild_aws" {
+    source = "../../modules/codebuild"
+    build_name = var.build_name
+    iam_codebuild_arn = module.iam_codebuild.codebuild_role_arn
+    ecr_repo_uri = var.ecr_repo_uri
+    source_location = var.source_location
+    source_type = var.source_type
+    source_version = var.source_version
+    auth_github_token = module.secret_manager.secret_manager_value
+    compute_type = var.compute_type
+    aws_region = var.aws_region
+}
