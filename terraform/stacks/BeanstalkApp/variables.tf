@@ -74,3 +74,8 @@ variable "password" {
 variable "DeploymentPolicy" {
     type = string
 }
+
+variable "personal-access-token-github" {
+    type = string
+    sensitive = true
+}
