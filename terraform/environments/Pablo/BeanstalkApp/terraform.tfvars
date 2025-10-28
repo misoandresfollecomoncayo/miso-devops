@@ -17,7 +17,6 @@ DeploymentPolicy = "AllAtOnce" # Cambiar luego a AllAtOnce, Immutable, Rolling, 
 #CodeBuild
 build_name = "codebuild_devops"
 compute_type = "BUILD_GENERAL1_MEDIUM"
-ecr_repo_uri = "291935881445.dkr.ecr.us-east-1.amazonaws.com/app-root"
 source_type = "GITHUB"
 source_location = "https://github.com/misoandresfollecomoncayo/miso-devops.git"
 source_version = "feature/codebuild"

@@ -4,7 +4,8 @@ resource "aws_codebuild_project" "docker_build" {
     service_role  = var.iam_codebuild_arn
 
     artifacts {
-        type = "NO_ARTIFACTS"
+        type = "S3"
+        location = var.bucket_versiones
     }
 
     environment {

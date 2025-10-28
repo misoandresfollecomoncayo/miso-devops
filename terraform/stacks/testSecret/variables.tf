@@ -21,7 +21,7 @@ variable "compute_type" {
     type = string
 }
 
-variable "ecr_repo_uri" {
+variable "ecr_image_uri" {
     type = string
 }
 

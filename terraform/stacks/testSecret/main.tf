@@ -24,7 +24,7 @@ module "codebuild_aws" {
     source = "../../modules/codebuild"
     build_name = var.build_name
     iam_codebuild_arn = module.iam_codebuild.codebuild_role_arn
-    ecr_repo_uri = var.ecr_repo_uri
+    ecr_repo_uri = var.ecr_image_uri
     source_location = var.source_location
     source_type = var.source_type
     source_version = var.source_version

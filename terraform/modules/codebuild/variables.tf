@@ -33,3 +33,7 @@ variable "aws_region" {
 variable "source_version" {
     type = string
 }
+
+variable "bucket_versiones" {
+    type = string
+}
