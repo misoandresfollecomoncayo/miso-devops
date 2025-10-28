@@ -35,9 +35,7 @@ phases:
           ]
         }
         EOF
-      - NAME_ZIP="Dockerrun_${IMAGE_TAG}.zip"
-      - export NAME_ZIP
-      - zip -r NAME_ZIP Dockerrun.aws.json
+      - zip -r "Dockerrun_${IMAGE_TAG}.zip" Dockerrun.aws.json
 
   post_build:
     commands:
@@ -47,5 +45,5 @@ phases:
 
 artifacts:
   files:
-    - 'NAME_ZIP'
+    - Dockerrun_*.zip
   discard-paths: yes
