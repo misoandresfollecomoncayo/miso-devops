@@ -1,12 +1,11 @@
 from datetime import datetime
 import re
 import uuid
-from flask import request, jsonify
-from app import create_app
+from flask import Blueprint, request, jsonify
 from database import db
 from models.blacklists import Blacklists
 
-app = create_app()
+blacklists_bp = Blueprint("blacklists", __name__)
 
 def is_uuid(value: str) -> bool:
     try:
@@ -20,12 +19,12 @@ def is_email(value: str) -> bool:
     return re.match(pattern, value) is not None
 
 # Agregar health check
-@app.route('/ping', methods=['GET'])
+@blacklists_bp.route('/ping', methods=['GET'])
 def health_check():
     return "Ok", 200
 
 # Permite agregar un email a la lista negra global de la organización
-@app.route('/blacklists', methods=['POST'])
+@blacklists_bp.route('/blacklists', methods=['POST'])
 def blacklists():
     # Validar header de autorización
     auth_header = request.headers.get('Authorization')
@@ -75,7 +74,7 @@ def blacklists():
         "status": "success"
     }), 200
 
-@app.route('/blacklists/<email>', methods=['GET'])
+@blacklists_bp.route('/blacklists/<email>', methods=['GET'])
 def get_blacklist(email):
     # Validar header de autorización
     auth_header = request.headers.get('Authorization')
@@ -102,6 +101,3 @@ def get_blacklist(email):
     return jsonify({
         "blacklist": True
     }), 200
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
