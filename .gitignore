@@ -1,6 +1,6 @@
 src/__pycache__
 src/models/__pycache__
-
+venv/
 
 #terraform
 terraform/stacks/BeanstalkApp/.terraform/*
