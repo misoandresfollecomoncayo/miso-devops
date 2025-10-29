@@ -26,7 +26,7 @@ def test_blacklists_success_with_mock(client):
 
         response = client.post('/blacklists', json=payload, headers=headers)
 
-        assert response.status_code == 200
+        assert response.status_code == False
         assert response.json["status"] == "success"
 
         mock_add.assert_called_once()
