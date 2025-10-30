@@ -75,11 +75,6 @@ variable "DeploymentPolicy" {
     type = string
 }
 
-variable "personal-access-token-github" {
-    type = string
-    sensitive = true
-}
-
 variable "build_name" {
     type = string
 }

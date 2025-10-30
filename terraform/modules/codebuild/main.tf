@@ -4,8 +4,7 @@ resource "aws_codebuild_project" "docker_build" {
     service_role  = var.iam_codebuild_arn
 
     artifacts {
-        type = "S3"
-        location = var.bucket_versiones
+        type = var.source_type
     }
 
     environment {
@@ -49,18 +48,18 @@ resource "aws_codebuild_project" "docker_build" {
 
     source {
         type      = var.source_type
-        location  = var.source_location
-        buildspec = "buildspec.yml"
-        git_clone_depth = 1
-
-        git_submodules_config {
-            fetch_submodules = true
-        }
-
-        auth {
-            type = "OAUTH"
-            resource = var.auth_github_token
-        }
+        #location  = var.source_location
+        #buildspec = "buildspec.yml"
+        #git_clone_depth = 1
+        #
+        #git_submodules_config {
+        #    fetch_submodules = true
+        #}
+        #
+        #auth {
+        #    type = "CODECONNECTIONS"
+        #    resource = var.codeconnections_arn
+        #}
 
     }
 

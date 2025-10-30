@@ -17,6 +17,8 @@ DeploymentPolicy = "AllAtOnce" # Cambiar luego a AllAtOnce, Immutable, Rolling, 
 #CodeBuild
 build_name = "codebuild_devops"
 compute_type = "BUILD_GENERAL1_MEDIUM"
-source_type = "GITHUB"
-source_location = "https://github.com/misoandresfollecomoncayo/miso-devops.git"
+source_type = "CODEPIPELINE"
+source_location = "misoandresfollecomoncayo/miso-devops.git"
 source_version = "feature/codebuild"
+#Codepipeline
+pipeline_name = "codepipeline_devops"

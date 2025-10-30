@@ -65,12 +65,11 @@ module "iam_codebuild" {
 }
 
 ###########################################################
-# Personal Token Github
+# CodeConnections for github
 ###########################################################
 
-module "secret_manager" {
-    source = "../../modules/secret_manager"
-    personal-access-token-github = var.personal-access-token-github
+module "connection_github" {
+    source = "../../modules/code_connections_github"
 }
 
 ###########################################################
@@ -85,7 +84,7 @@ module "codebuild_aws" {
     source_location = var.source_location
     source_type = var.source_type
     source_version = var.source_version
-    auth_github_token = module.secret_manager.secret_manager_value
+    codeconnections_arn = module.connection_github.codeconnettions_arn
     compute_type = var.compute_type
     aws_region = var.aws_region
     bucket_versiones = module.s3_bucket_for_versions.bucket_name

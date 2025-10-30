@@ -17,12 +17,11 @@ module "iam_codebuild" {
 }
 
 ###########################################################
-# Personal Token Github
+# CodeConnections for github
 ###########################################################
 
-module "secret_manager" {
-    source = "../../modules/secret_manager"
-    personal-access-token-github = var.personal-access-token-github
+module "connection_github" {
+    source = "../../modules/code_connections_github"
 }
 
 ###########################################################
@@ -37,7 +36,7 @@ module "codebuild_aws" {
     source_location = var.source_location
     source_type = var.source_type
     source_version = var.source_version
-    auth_github_token = module.secret_manager.secret_manager_value
+    codeconnections_arn = module.connection_github.codeconnettions_arn
     compute_type = var.compute_type
     aws_region = var.aws_region
     bucket_versiones = module.s3_bucket_for_versions.bucket_name
@@ -45,4 +44,28 @@ module "codebuild_aws" {
     db_host = var.db_host #Este es la salida de un modulo
     username = var.username
     password = var.password
+}
+
+###########################################################
+# IAM CodePipeline
+###########################################################
+
+module "iam_codepipeline" {
+    source = "../../modules/iam_codepipeline"
+}
+
+
+###########################################################
+# CodePipeline project configuration
+###########################################################
+
+module "codepipeline_aws" {
+    source = "../../modules/codepipeline"
+    pipeline_name = var.pipeline_name
+    bucket_versiones = module.s3_bucket_for_versions.bucket_name
+    source_location = var.source_location
+    codebuild_name = module.codebuild_aws.project_name
+    codeconnections_arn = module.connection_github.codeconnettions_arn
+    source_version = var.source_version
+    role_arn = module.iam_codepipeline.codepipeline_role_arn
 }

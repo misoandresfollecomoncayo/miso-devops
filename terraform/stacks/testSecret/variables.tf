@@ -8,11 +8,6 @@ variable "owner" {
     type        = string
 }
 
-variable "personal-access-token-github" {
-    type = string
-    sensitive = true
-}
-
 variable "build_name" {
     type = string
 }
@@ -66,3 +61,7 @@ variable "db_host" {
     type = string
     default = "test"
 } 
+
+variable "pipeline_name" {
+    type = string
+}

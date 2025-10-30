@@ -22,7 +22,7 @@ variable "source_location" {
     type = string
 }
 
-variable "auth_github_token" {
+variable "codeconnections_arn" {
     type = string
 }
 
