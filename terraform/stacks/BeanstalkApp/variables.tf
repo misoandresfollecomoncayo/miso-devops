@@ -94,3 +94,7 @@ variable "source_location" {
 variable "source_version" {
     type = string
 }
+
+variable "pipeline_name" {
+    type = string
+}

@@ -93,3 +93,27 @@ module "codebuild_aws" {
     username = var.username
     password = var.password
 }
+
+###########################################################
+# IAM CodePipeline
+###########################################################
+
+module "iam_codepipeline" {
+    source = "../../modules/iam_codepipeline"
+    codeconnections_arn = module.connection_github.codeconnettions_arn
+}
+
+###########################################################
+# CodePipeline project configuration
+###########################################################
+
+module "codepipeline_aws" {
+    source = "../../modules/codepipeline"
+    pipeline_name = var.pipeline_name
+    bucket_versiones = module.s3_bucket_for_versions.bucket_name
+    source_location = var.source_location
+    codebuild_name = module.codebuild_aws.project_name
+    codeconnections_arn = module.connection_github.codeconnettions_arn
+    source_version = var.source_version
+    role_arn = module.iam_codepipeline.codepipeline_role_arn
+}

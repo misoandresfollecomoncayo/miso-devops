@@ -38,6 +38,7 @@ resource "aws_codepipeline" "docker_build_pipe" {
             owner = "AWS"
             provider = "CodeBuild"
             input_artifacts = ["source_output"]
+            output_artifacts = ["build_output"]
             version = "1"
 
             configuration = {
