@@ -84,7 +84,7 @@ def test_get_blacklist_email_not_found(mock_is_email, mock_blacklists, client):
     headers = {"Authorization": "Bearer token_valido"}
     response = client.get('/blacklists/user@example.com', headers=headers)
     
-    assert response.status_code == 200
+    assert response.status_code == False
     assert response.json["blacklist"] == False
     mock_is_email.assert_called_once_with('user@example.com')
     mock_blacklists.query.filter_by.assert_called_once_with(email='user@example.com')
