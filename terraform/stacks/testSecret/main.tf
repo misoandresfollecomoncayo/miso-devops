@@ -52,6 +52,7 @@ module "codebuild_aws" {
 
 module "iam_codepipeline" {
     source = "../../modules/iam_codepipeline"
+    codeconnections_arn = module.connection_github.codeconnettions_arn
 }
 
 

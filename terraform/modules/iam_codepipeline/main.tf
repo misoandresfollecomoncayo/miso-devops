@@ -31,11 +31,10 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         {
             Effect = "Allow",
             Action = [
-                "codeconnections:GetConnectionToken",
-                "codeconnections:GetConnection",
-				"codeconnections:UseConnection"
+                "codeconnections:*",
+                "codestar-connections:*"
             ],
-            Resource = "*"
+            Resource = var.codeconnections_arn
         },
         {
             Effect = "Allow",

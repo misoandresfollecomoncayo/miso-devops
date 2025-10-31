@@ -18,7 +18,7 @@ DeploymentPolicy = "AllAtOnce" # Cambiar luego a AllAtOnce, Immutable, Rolling, 
 build_name = "codebuild_devops"
 compute_type = "BUILD_GENERAL1_MEDIUM"
 source_type = "CODEPIPELINE"
-source_location = "misoandresfollecomoncayo/miso-devops.git"
-source_version = "feature/codebuild"
+source_location = "privera2505/miso-devops"
+source_version = "feature/codepipeline"
 #Codepipeline
 pipeline_name = "codepipeline_devops"

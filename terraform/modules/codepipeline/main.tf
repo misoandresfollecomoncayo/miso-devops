@@ -7,6 +7,9 @@ resource "aws_codepipeline" "docker_build_pipe" {
         type = "S3"
     }
 
+    pipeline_type = "V2"
+    execution_mode = "QUEUED"
+
     stage {
         name = "Source"
 
