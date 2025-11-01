@@ -1,0 +1,55 @@
+version: 0.2
+
+
+phases:
+  install:
+    commands:
+      - pip install -r requirements.txt
+
+  pre_build:
+    commands:
+      - echo Running unit tests...
+      - pytest -v src/test/test.py --maxfail=1 --disable-warnings -q || (echo "Tests failed" && exit 1)
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
+      - echo $ECR_REPO_URI
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION)
+      - export IMAGE_TAG
+
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build -t $ECR_REPO_URI:$IMAGE_TAG .
+      - docker tag $ECR_REPO_URI:$IMAGE_TAG $ECR_REPO_URI:$IMAGE_TAG
+      - |
+        cat > Dockerrun.aws.json <<EOF
+        {
+          "AWSEBDockerrunVersion": "1",
+          "Image": {
+            "Name": "$ECR_REPO_URI:$IMAGE_TAG",
+            "Update": "true"
+          },
+          "Ports": [
+            { "ContainerPort": "8000" }
+          ],
+          "Environment": [
+            { "Name": "DB_USER", "Value": "$DB_USER" },
+            { "Name": "DB_PASSWORD", "Value": "$DB_PASSWORD" },
+            { "Name": "DB_NAME", "Value": "$DB_NAME" },
+            { "Name": "DB_HOST", "Value": "$DB_HOST" }
+          ]
+        }
+        EOF
+      - zip -r "Dockerrun_${IMAGE_TAG}.zip" Dockerrun.aws.json
+
+  post_build:
+    commands:
+      - echo Pushing the Docker image to ECR...
+      - docker push $ECR_REPO_URI:$IMAGE_TAG
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - Dockerrun_*.zip
+  discard-paths: yes

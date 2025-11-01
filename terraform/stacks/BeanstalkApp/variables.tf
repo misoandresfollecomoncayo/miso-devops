@@ -74,3 +74,27 @@ variable "password" {
 variable "DeploymentPolicy" {
     type = string
 }
+
+variable "build_name" {
+    type = string
+}
+
+variable "compute_type" {
+    type = string
+}
+
+variable "source_type" {
+    type = string
+}
+
+variable "source_location" {
+    type = string
+}
+
+variable "source_version" {
+    type = string
+}
+
+variable "pipeline_name" {
+    type = string
+}

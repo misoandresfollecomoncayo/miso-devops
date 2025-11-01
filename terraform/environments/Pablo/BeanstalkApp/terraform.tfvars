@@ -14,3 +14,11 @@ db_name  = "dbdevops"
 username = "postgres"
 password = "postgres"
 DeploymentPolicy = "AllAtOnce" # Cambiar luego a AllAtOnce, Immutable, Rolling, RollingWithAdditionalBatch
+#CodeBuild
+build_name = "codebuild_devops"
+compute_type = "BUILD_GENERAL1_MEDIUM"
+source_type = "CODEPIPELINE"
+source_location = "privera2505/miso-devops"
+source_version = "feature/codepipeline"
+#Codepipeline
+pipeline_name = "codepipeline_devops"
