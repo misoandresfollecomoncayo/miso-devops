@@ -92,3 +92,4 @@ https://www.postman.com/misoandresfollecomoncayo-9717669/miso-devops/collection/
 # Videos de las entregas
 
 * Entrega 1: https://drive.google.com/file/d/1zjUT5zi4UIbPUqDhEecvAmYlLivAYw3X/view?usp=sharing
+* Entrega 2: https://drive.google.com/file/d/1sy7MgLiJfn93papLaZSNCYN77NrFEXWr/view?usp=sharing
