@@ -4,20 +4,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import json
 import pytest
 from unittest.mock import patch, MagicMock
-
-# Mock database.create_database_if_not_exists ANTES de importar app
-with patch('database.create_database_if_not_exists'):
-    from app import create_app
+from app import create_app
 
 @pytest.fixture
 def client():
     """Crea un cliente de prueba con base de datos en memoria (SQLite)"""
-    with patch('database.create_database_if_not_exists'), \
-         patch('database.db.create_all'):
-        app = create_app(testing=True)
-        app.config['TESTING'] = True
-        with app.test_client() as client:
-            yield client
+    app = create_app(testing=True)
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
 
 def test_ping(client):
     """Test del endpoint /ping sin conexión a BD"""
