@@ -1,0 +1,49 @@
+{
+  "applicationName": "python-app-dev-app",
+  "deploymentGroupName": "python-app-dev-dg",
+  "serviceRoleArn": "arn:aws:iam::148342400171:role/python-app-dev-codedeploy-role",
+  "deploymentConfigName": "CodeDeployDefault.ECSAllAtOnce",
+  "ecsServices": [
+    {
+      "serviceName": "python-app-dev-service",
+      "clusterName": "python-app-dev-cluster"
+    }
+  ],
+  "loadBalancerInfo": {
+    "targetGroupPairInfoList": [
+      {
+        "targetGroups": [
+          {
+            "name": "python-app-dev-blue-tg"
+          },
+          {
+            "name": "python-app-dev-green-tg"
+          }
+        ],
+        "prodTrafficRoute": {
+          "listenerArns": [
+            "arn:aws:elasticloadbalancing:us-east-1:148342400171:listener/app/python-app-dev-alb/0d7bc04932684e1e/b49f4687f4873302"
+          ]
+        },
+        "testTrafficRoute": {
+          "listenerArns": [
+            "arn:aws:elasticloadbalancing:us-east-1:148342400171:listener/app/python-app-dev-alb/0d7bc04932684e1e/3c552b75a9e3258e"
+          ]
+        }
+      }
+    ]
+  },
+  "blueGreenDeploymentConfiguration": {
+    "terminateBlueInstancesOnDeploymentSuccess": {
+      "action": "TERMINATE",
+      "terminationWaitTimeInMinutes": 5
+    },
+    "deploymentReadyOption": {
+      "actionOnTimeout": "CONTINUE_DEPLOYMENT"
+    }
+  },
+  "deploymentStyle": {
+    "deploymentType": "BLUE_GREEN",
+    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+  }
+}
