@@ -45,8 +45,3 @@ artifacts:
     - appspec.json
     - taskdef.json
     - imagedefinitions.json
-
-artifacts:
-  files:
-    - Dockerrun_*.zip
-  discard-paths: yes
