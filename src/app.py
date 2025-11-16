@@ -34,7 +34,13 @@ def create_app(testing=False):
     return app
 
 # Configuración para ejecución directa y como módulo
-app = create_app(testing=False)
+# Solo crear la app si NO estamos en modo testing
+if getenv('TESTING') != 'true':
+    app = create_app(testing=False)
+else:
+    app = None
 
 if __name__ == '__main__':
+    if app is None:
+        app = create_app(testing=False)
     app.run(debug=True, host='0.0.0.0', port=5000)
