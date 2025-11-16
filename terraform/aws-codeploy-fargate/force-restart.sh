@@ -6,7 +6,7 @@ CLUSTER="python-app-dev-cluster"
 SERVICE="python-app-dev-service"
 REGION="us-east-1"
 
-echo "🔄 Obteniendo tareas en ejecución..."
+echo "[INFO] Obteniendo tareas en ejecución..."
 TASKS=$(aws ecs list-tasks \
   --cluster "$CLUSTER" \
   --service-name "$SERVICE" \
@@ -15,7 +15,7 @@ TASKS=$(aws ecs list-tasks \
   --output text)
 
 if [ -z "$TASKS" ]; then
-  echo "✓ No hay tareas en ejecución"
+  echo "[OK] No hay tareas en ejecución"
   exit 0
 fi
 
@@ -30,7 +30,7 @@ for TASK in $TASKS; do
     --output text > /dev/null 2>&1
 done
 
-echo "✓ Tareas detenidas"
+echo "[OK] Tareas detenidas"
 echo ""
 echo "⏳ Esperando que el servicio arranque nuevas tareas (esto toma ~30 segundos)..."
 sleep 10
@@ -54,9 +54,9 @@ for i in {1..6}; do
   
   if [ "$RUNNING" -gt 0 ]; then
     echo ""
-    echo "✅ Nueva tarea en ejecución!"
+    echo "[OK] Nueva tarea en ejecución!"
     echo ""
-    echo "📊 Ver logs:"
+    echo "[STATUS] Ver logs:"
     echo "   aws logs tail /ecs/python-app-dev --follow --region $REGION"
     exit 0
   fi
@@ -65,6 +65,6 @@ for i in {1..6}; do
 done
 
 echo ""
-echo "⚠️  Las tareas aún no están en estado RUNNING"
+echo "[WARNING]  Las tareas aún no están en estado RUNNING"
 echo "   Verifica los logs para más detalles"
 echo "   aws logs tail /ecs/python-app-dev --follow --region $REGION"

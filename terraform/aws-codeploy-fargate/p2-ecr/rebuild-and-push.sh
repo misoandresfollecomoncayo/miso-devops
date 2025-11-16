@@ -44,7 +44,7 @@ aws ecr get-login-password --region ${REGION} | \
   docker login --username AWS --password-stdin ${ECR_URL}
 
 if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✓ Autenticación exitosa${NC}"
+  echo -e "${GREEN}[OK] Autenticación exitosa${NC}"
 else
   echo -e "${RED}✗ Error en autenticación${NC}"
   exit 1
@@ -56,11 +56,11 @@ cd ${PROJECT_ROOT}
 
 # Verificar si buildx está disponible
 if ! docker buildx version &> /dev/null; then
-  echo -e "${YELLOW}⚠️  Docker buildx no disponible, usando build normal${NC}"
-  echo -e "${YELLOW}⚠️  ADVERTENCIA: La imagen puede no ser compatible con Fargate${NC}"
+  echo -e "${YELLOW}[WARNING]  Docker buildx no disponible, usando build normal${NC}"
+  echo -e "${YELLOW}[WARNING]  ADVERTENCIA: La imagen puede no ser compatible con Fargate${NC}"
   docker build --platform linux/amd64 -t ${REPOSITORY_NAME}:${IMAGE_TAG} .
 else
-  echo -e "${GREEN}✓ Usando docker buildx para multi-arquitectura${NC}"
+  echo -e "${GREEN}[OK] Usando docker buildx para multi-arquitectura${NC}"
   docker buildx build \
     --platform linux/amd64 \
     --load \
@@ -70,7 +70,7 @@ else
 fi
 
 if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✓ Imagen construida exitosamente para linux/amd64${NC}"
+  echo -e "${GREEN}[OK] Imagen construida exitosamente para linux/amd64${NC}"
 else
   echo -e "${RED}✗ Error al construir imagen${NC}"
   exit 1
@@ -81,7 +81,7 @@ echo -e "\n${BLUE}[3/4] Etiquetando imagen para ECR...${NC}"
 docker tag ${REPOSITORY_NAME}:${IMAGE_TAG} ${FULL_IMAGE_NAME}
 
 if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✓ Imagen etiquetada: ${FULL_IMAGE_NAME}${NC}"
+  echo -e "${GREEN}[OK] Imagen etiquetada: ${FULL_IMAGE_NAME}${NC}"
 else
   echo -e "${RED}✗ Error al etiquetar imagen${NC}"
   exit 1
@@ -92,7 +92,7 @@ echo -e "\n${BLUE}[4/4] Subiendo imagen a ECR...${NC}"
 docker push ${FULL_IMAGE_NAME}
 
 if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✓ Imagen subida exitosamente${NC}"
+  echo -e "${GREEN}[OK] Imagen subida exitosamente${NC}"
 else
   echo -e "${RED}✗ Error al subir imagen${NC}"
   exit 1
@@ -100,7 +100,7 @@ fi
 
 # Resumen
 echo -e "\n${GREEN}================================================${NC}"
-echo -e "${GREEN}  ✓ Proceso completado exitosamente${NC}"
+echo -e "${GREEN}  [OK] Proceso completado exitosamente${NC}"
 echo -e "${GREEN}================================================${NC}"
 echo -e "\nImagen disponible en:"
 echo -e "  ${FULL_IMAGE_NAME}\n"

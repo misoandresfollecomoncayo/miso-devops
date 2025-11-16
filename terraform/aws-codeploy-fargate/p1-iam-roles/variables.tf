@@ -1,12 +1,8 @@
-# ============================================
 # Variables de entrada para el Paso 1
-# ============================================
 # Este archivo SOLO define las variables
 # Los VALORES se asignan en terraform.tfvars
 
-# ============================================
 # Variable: Región de AWS
-# ============================================
 variable "aws_region" {
     description = "Región de AWS donde se desplegarán los recursos"
     type        = string
@@ -18,9 +14,7 @@ variable "aws_region" {
     }
 }
 
-# ============================================
 # Variable: Nombre del proyecto
-# ============================================
 variable "project_name" {
   description = "Nombre del proyecto (se usa como prefijo en recursos)"
   type        = string
@@ -32,9 +26,7 @@ variable "project_name" {
   }
 }
 
-# ============================================
 # Variable: Ambiente
-# ============================================
 variable "environment" {
   description = "Ambiente de despliegue (dev, staging, prod)"
   type        = string

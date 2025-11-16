@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🔄 Actualizando estrategia de despliegue Blue/Green..."
+echo "[INFO] Actualizando estrategia de despliegue Blue/Green..."
 echo ""
 
 # Opciones disponibles:
@@ -26,7 +26,7 @@ aws deploy update-deployment-group \
 
 if [ $? -eq 0 ]; then
   echo ""
-  echo "✅ Estrategia actualizada exitosamente"
+  echo "[OK] Estrategia actualizada exitosamente"
   echo ""
   echo "Verificando:"
   aws deploy get-deployment-group \
@@ -36,5 +36,5 @@ if [ $? -eq 0 ]; then
     --query 'deploymentGroupInfo.deploymentConfigName' \
     --output text
 else
-  echo "❌ Error actualizando estrategia"
+  echo "[ERROR] Error actualizando estrategia"
 fi

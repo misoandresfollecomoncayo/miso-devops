@@ -1,6 +1,4 @@
-# ============================================
 # Outputs para RDS PostgreSQL
-# ============================================
 
 output "db_instance_id" {
   description = "ID de la instancia RDS"
@@ -43,9 +41,7 @@ output "db_security_group_id" {
   value       = aws_security_group.rds.id
 }
 
-# ============================================
 # Connection Info para ECS
-# ============================================
 
 output "connection_info" {
   description = "Información de conexión para usar en ECS Task Definition"
@@ -59,18 +55,14 @@ output "connection_info" {
   sensitive = true
 }
 
-# ============================================
 # Console URL
-# ============================================
 
 output "console_url" {
   description = "URL para ver RDS en AWS Console"
   value       = "https://console.aws.amazon.com/rds/home?region=${data.aws_region.current.name}#database:id=${aws_db_instance.postgres.identifier}"
 }
 
-# ============================================
 # Resumen
-# ============================================
 
 output "rds_summary" {
   description = "Resumen completo de RDS PostgreSQL"

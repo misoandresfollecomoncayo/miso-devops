@@ -13,7 +13,7 @@ CONNECTION_ARN=$(aws codestar-connections create-connection \
   --output text 2>/dev/null || echo "")
 
 if [ -z "$CONNECTION_ARN" ]; then
-  echo "❌ Error creando conexión o ya existe"
+  echo "[ERROR] Error creando conexión o ya existe"
   
   # Verificar si ya existe
   CONNECTION_ARN=$(aws codestar-connections list-connections \
@@ -23,11 +23,11 @@ if [ -z "$CONNECTION_ARN" ]; then
     --output text)
   
   if [ -z "$CONNECTION_ARN" ]; then
-    echo "❌ No se pudo obtener la conexión"
+    echo "[ERROR] No se pudo obtener la conexión"
     exit 1
   fi
   
-  echo "✅ Usando conexión existente"
+  echo "[OK] Usando conexión existente"
 fi
 
 echo ""
@@ -41,11 +41,11 @@ STATUS=$(aws codestar-connections get-connection \
   --query 'Connection.ConnectionStatus' \
   --output text)
 
-echo "📊 Estado actual: $STATUS"
+echo "[STATUS] Estado actual: $STATUS"
 echo ""
 
 if [ "$STATUS" = "PENDING" ]; then
-  echo "⚠️  La conexión está en estado PENDING"
+  echo "[WARNING]  La conexión está en estado PENDING"
   echo ""
   echo "🔧 ACCIÓN REQUERIDA:"
   echo "1. Abre esta URL:"
@@ -64,13 +64,13 @@ if [ "$STATUS" = "PENDING" ]; then
 fi
 
 if [ "$STATUS" = "AVAILABLE" ]; then
-  echo "✅ La conexión está DISPONIBLE"
+  echo "[OK] La conexión está DISPONIBLE"
   echo ""
   echo "📝 Guarda este ARN para actualizar Terraform:"
   echo "   $CONNECTION_ARN"
   echo ""
-  echo "🚀 Próximo paso: Actualizar main.tf para usar CodeStar Connection"
+  echo "[DEPLOY] Próximo paso: Actualizar main.tf para usar CodeStar Connection"
 else
-  echo "⚠️  Estado inesperado: $STATUS"
+  echo "[WARNING]  Estado inesperado: $STATUS"
   exit 1
 fi

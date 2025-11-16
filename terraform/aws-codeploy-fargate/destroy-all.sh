@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# ============================================
 # Script de Destrucción Completa
 # Tutorial 5 - AWS CodeDeploy con Fargate
-# ============================================
 
 # No usar set -e para que continúe aunque fallen algunos destroy
 set -u  # Error en variables no definidas
@@ -20,9 +18,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${SCRIPT_DIR}/destruction.log"
 START_TIME=$(date +%s)
 
-# ============================================
 # Funciones auxiliares
-# ============================================
 
 log() {
     echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1" | tee -a "$LOG_FILE"
@@ -43,15 +39,15 @@ log_step() {
 }
 
 confirm_destruction() {
-    echo -e "\n${RED}⚠️  ADVERTENCIA: DESTRUCCIÓN DE INFRAESTRUCTURA ⚠️${NC}\n"
+    echo -e "\n${RED}ADVERTENCIA: DESTRUCCIÓN DE INFRAESTRUCTURA${NC}\n"
     echo -e "Este script ${RED}ELIMINARÁ${NC} todos los recursos creados:"
     echo -e ""
-    echo -e "  🐳 ECS Cluster y Service"
-    echo -e "  🗄️  Base de datos RDS PostgreSQL"
-    echo -e "  ⚖️  Application Load Balancer"
-    echo -e "  🌐 VPC y Networking"
-    echo -e "  📦 ECR Repository (con todas las imágenes)"
-    echo -e "  🔐 IAM Roles"
+    echo -e "  - ECS Cluster y Service"
+    echo -e "  - Base de datos RDS PostgreSQL"
+    echo -e "  - Application Load Balancer"
+    echo -e "  - VPC y Networking"
+    echo -e "  - ECR Repository (con todas las imágenes)"
+    echo -e "  - IAM Roles"
     echo -e ""
     echo -e "${YELLOW}Esta acción NO se puede deshacer.${NC}"
     echo -e ""
@@ -91,7 +87,7 @@ terraform_destroy() {
         return 1
     }
     
-    log "${GREEN}✓ $step_name destruido${NC}"
+    log "${GREEN}[OK] $step_name destruido${NC}"
 }
 
 delete_ecr_images() {
@@ -116,7 +112,7 @@ delete_ecr_images() {
                 --repository-name "$ecr_repo" \
                 --region us-east-1 \
                 --image-ids "$image_ids" >> "$LOG_FILE" 2>&1 || true
-            log "✓ Imágenes eliminadas"
+            log "[OK] Imágenes eliminadas"
         else
             log "No hay imágenes para eliminar en ECR"
         fi
@@ -161,7 +157,7 @@ force_delete_ecs_service() {
         log "Esperando confirmación de eliminación (10 segundos)..."
         sleep 10
         
-        log "✓ Servicio ECS eliminado"
+        log "[OK] Servicio ECS eliminado"
     else
         log_warning "Servicio ECS no encontrado o ya inactivo, saltando..."
     fi
@@ -173,15 +169,13 @@ clean_terraform_state() {
     find "$SCRIPT_DIR" -type f \( -name "terraform.tfstate*" -o -name "tfplan" -o -name "*.tfvars.bak" \) -delete 2>/dev/null || true
     find "$SCRIPT_DIR" -type d -name ".terraform" -exec rm -rf {} + 2>/dev/null || true
     
-    log "✓ Archivos de estado limpiados"
+    log "[OK] Archivos de estado limpiados"
 }
 
-# ============================================
 # Main Destruction Flow
-# ============================================
 
 main() {
-    log_step "🗑️  Iniciando Destrucción Completa"
+    log_step "[DESTROY]  Iniciando Destrucción Completa"
     log "Log file: $LOG_FILE"
     
     # Confirmar destrucción
@@ -234,22 +228,22 @@ main() {
     MINUTES=$((DURATION / 60))
     SECONDS=$((DURATION % 60))
     
-    log_step "✅ Destrucción Completada"
+    log_step "[DONE] Destrucción Completada"
     
-    echo -e "\n${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║          DESTRUCCIÓN COMPLETADA EXITOSAMENTE               ║${NC}"
-    echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}\n"
+    echo -e "\n${GREEN}=====================================================================${NC}"
+    echo -e "${GREEN}           DESTRUCCIÓN COMPLETADA EXITOSAMENTE                     ${NC}"
+    echo -e "${GREEN}=====================================================================${NC}\n"
     
-    echo -e "${BLUE}📊 Recursos Eliminados:${NC}\n"
-    echo -e "  ✓ CodePipeline y CodeBuild"
-    echo -e "  ✓ ECS Cluster y Service"
-    echo -e "  ✓ Base de datos RDS PostgreSQL"
-    echo -e "  ✓ Application Load Balancer"
-    echo -e "  ✓ VPC y Networking"
-    echo -e "  ✓ ECR Repository e imágenes"
-    echo -e "  ✓ IAM Roles"
+    echo -e "${BLUE}Recursos Eliminados:${NC}\n"
+    echo -e "  [OK] CodePipeline y CodeBuild"
+    echo -e "  [OK] ECS Cluster y Service"
+    echo -e "  [OK] Base de datos RDS PostgreSQL"
+    echo -e "  [OK] Application Load Balancer"
+    echo -e "  [OK] VPC y Networking"
+    echo -e "  [OK] ECR Repository e imágenes"
+    echo -e "  [OK] IAM Roles"
     
-    echo -e "\n${BLUE}⏱️  Tiempo de Destrucción:${NC} ${MINUTES}m ${SECONDS}s\n"
+    echo -e "\n${BLUE}Tiempo de Destrucción:${NC} ${MINUTES}m ${SECONDS}s\n"
     
     # Resetear terraform.tfvars a valores placeholder
     log_step "Reseteando terraform.tfvars"
@@ -264,7 +258,7 @@ main() {
     sed -i.bak "s/subnet_ids *= *\[.*\]/subnet_ids = [\"subnet-PLACEHOLDER1\", \"subnet-PLACEHOLDER2\"]/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
     sed -i.bak "s/db_host = \".*\"/db_host = \"db-PLACEHOLDER.rds.amazonaws.com\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
     
-    log "✓ Variables reseteadas a placeholders"
+    log "[OK] Variables reseteadas a placeholders"
     
     echo -e "\n${YELLOW}📝 Verificación Recomendada:${NC}\n"
     echo -e "  1. Revisa AWS Console para confirmar que no quedan recursos huérfanos"
@@ -276,9 +270,7 @@ main() {
     log "Log guardado en: $LOG_FILE"
 }
 
-# ============================================
 # Manejo de señales
-# ============================================
 
 cleanup() {
     log_error "Script interrumpido por el usuario"
@@ -287,8 +279,6 @@ cleanup() {
 
 trap cleanup SIGINT SIGTERM
 
-# ============================================
 # Ejecutar main
-# ============================================
 
 main "$@"

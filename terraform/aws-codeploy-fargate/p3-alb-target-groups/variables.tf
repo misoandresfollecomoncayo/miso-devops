@@ -1,12 +1,8 @@
-# ============================================
 # Variables de entrada para el Paso 3 - VPC, ALB y Target Groups
-# ============================================
 # Este archivo SOLO define las variables
 # Los VALORES se asignan en terraform.tfvars
 
-# ============================================
 # Variable: Región de AWS
-# ============================================
 variable "aws_region" {
   description = "Región de AWS donde se desplegarán los recursos"
   type        = string
@@ -18,9 +14,7 @@ variable "aws_region" {
   }
 }
 
-# ============================================
 # Variable: Nombre del proyecto
-# ============================================
 variable "project_name" {
   description = "Nombre del proyecto (se usa como prefijo en recursos)"
   type        = string
@@ -32,9 +26,7 @@ variable "project_name" {
   }
 }
 
-# ============================================
 # Variable: Ambiente
-# ============================================
 variable "environment" {
   description = "Ambiente de despliegue (dev, staging, prod)"
   type        = string
@@ -46,9 +38,7 @@ variable "environment" {
   }
 }
 
-# ============================================
 # Variable: CIDR de la VPC
-# ============================================
 variable "vpc_cidr" {
   description = "CIDR block para la VPC"
   type        = string
@@ -60,9 +50,7 @@ variable "vpc_cidr" {
   }
 }
 
-# ============================================
 # Variable: CIDRs de subnets públicas
-# ============================================
 variable "public_subnet_cidrs" {
   description = "Lista de CIDR blocks para las subnets públicas"
   type        = list(string)
@@ -74,9 +62,7 @@ variable "public_subnet_cidrs" {
   }
 }
 
-# ============================================
 # Variable: Puerto de la aplicación
-# ============================================
 variable "app_port" {
   description = "Puerto en el que la aplicación escucha"
   type        = number
@@ -88,9 +74,7 @@ variable "app_port" {
   }
 }
 
-# ============================================
 # Variable: Path del health check
-# ============================================
 variable "health_check_path" {
   description = "Ruta para el health check del ALB"
   type        = string
@@ -102,9 +86,7 @@ variable "health_check_path" {
   }
 }
 
-# ============================================
 # Variable: Protección contra eliminación
-# ============================================
 variable "enable_deletion_protection" {
   description = "Habilitar protección contra eliminación del ALB"
   type        = bool

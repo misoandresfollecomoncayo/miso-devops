@@ -1,12 +1,12 @@
 #!/bin/bash
 
-echo "╔═══════════════════════════════════════════════════════════════╗"
-echo "║  🚀 Solución Pipeline - Migración a CodeStar Connection      ║"
-echo "╚═══════════════════════════════════════════════════════════════╝"
+echo "==================================================================="
+echo "   [DEPLOY] Solución Pipeline - Migración a CodeStar Connection  "
+echo "==================================================================="
 echo ""
 
 # Paso 1: Verificar estado de la conexión
-echo "📡 Paso 1: Verificando conexión CodeStar..."
+echo "[STEP] Paso 1: Verificando conexión CodeStar..."
 echo ""
 
 CONNECTION_ARN=$(aws codestar-connections list-connections \
@@ -16,7 +16,7 @@ CONNECTION_ARN=$(aws codestar-connections list-connections \
   --output text 2>/dev/null)
 
 if [ -z "$CONNECTION_ARN" ]; then
-  echo "❌ No existe conexión. Creándola..."
+  echo "[ERROR] No existe conexión. Creándola..."
   ./setup-codestar-connection.sh
   CONNECTION_ARN=$(aws codestar-connections list-connections \
     --provider-type-filter GitHub \
@@ -36,7 +36,7 @@ echo "Estado: $STATUS"
 echo ""
 
 if [ "$STATUS" = "PENDING" ]; then
-  echo "⚠️  ACCIÓN REQUERIDA: Autorizar conexión en AWS Console"
+  echo "[WARNING]  ACCIÓN REQUERIDA: Autorizar conexión en AWS Console"
   echo ""
   echo "┌─────────────────────────────────────────────────────────────┐"
   echo "│  INSTRUCCIONES:                                             │"
@@ -71,30 +71,30 @@ if [ "$STATUS" = "PENDING" ]; then
     --output text)
   
   if [ "$STATUS" != "AVAILABLE" ]; then
-    echo "❌ La conexión aún no está disponible (estado: $STATUS)"
+    echo "[ERROR] La conexión aún no está disponible (estado: $STATUS)"
     echo "Por favor completa la autorización y ejecuta el script nuevamente"
     exit 1
   fi
 fi
 
-echo "✅ Conexión disponible y lista"
+echo "[OK] Conexión disponible y lista"
 echo ""
 
 # Paso 2: Migrar Terraform
-echo "📡 Paso 2: Migrando configuración de Terraform..."
+echo "[STEP] Paso 2: Migrando configuración de Terraform..."
 echo ""
 
 ./migrate-to-codestar.sh
 
 if [ $? -ne 0 ]; then
-  echo "❌ Error en migración"
+  echo "[ERROR] Error en migración"
   exit 1
 fi
 
 echo ""
 
 # Paso 3: Aplicar Terraform
-echo "📡 Paso 3: Aplicando cambios con Terraform..."
+echo "[STEP] Paso 3: Aplicando cambios con Terraform..."
 echo ""
 
 terraform plan -out=tfplan
@@ -107,13 +107,13 @@ if [ "$CONFIRM" = "yes" ]; then
   rm tfplan
   
   echo ""
-  echo "╔═══════════════════════════════════════════════════════════════╗"
-  echo "║  ✅ MIGRACIÓN COMPLETADA                                      ║"
-  echo "╚═══════════════════════════════════════════════════════════════╝"
+  echo "==================================================================="
+  echo "   [OK] MIGRACIÓN COMPLETADA                                     "
+  echo "==================================================================="
   echo ""
   echo "🎉 El pipeline ahora usa CodeStar Connection"
   echo ""
-  echo "🚀 Próximos pasos:"
+  echo "[DEPLOY] Próximos pasos:"
   echo ""
   echo "1. Hacer un commit para probar:"
   echo "   cd /Users/usuari/Documents/Uniandes_temp/miso-devops"

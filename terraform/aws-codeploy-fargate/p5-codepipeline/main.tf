@@ -1,3 +1,6 @@
+# CodePipeline CI/CD
+# Pipeline automatizado de integración y despliegue continuo
+
 terraform {
   required_version = ">= 1.0"
   required_providers {
@@ -27,7 +30,6 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-# CodeStar Connection para GitHub
 data "aws_codestarconnections_connection" "github" {
   name = "python-app-dev-github"
 }
@@ -38,9 +40,7 @@ locals {
   name       = "${var.project_name}-${var.environment}"
 }
 
-# ============================================
-# S3 Bucket para Artifacts de CodePipeline
-# ============================================
+# S3 Bucket para artifacts de CodePipeline
 
 resource "aws_s3_bucket" "codepipeline_artifacts" {
   bucket = "${local.name}-pipeline-artifacts-${local.account_id}"
@@ -77,9 +77,7 @@ resource "aws_s3_bucket_public_access_block" "codepipeline_artifacts" {
   restrict_public_buckets = true
 }
 
-# ============================================
 # IAM Role para CodePipeline
-# ============================================
 
 resource "aws_iam_role" "codepipeline" {
   name = "${local.name}-codepipeline-role"
@@ -169,9 +167,7 @@ resource "aws_iam_role_policy" "codepipeline" {
   })
 }
 
-# ============================================
 # IAM Role para CodeBuild
-# ============================================
 
 resource "aws_iam_role" "codebuild" {
   name = "${local.name}-codebuild-role"
@@ -247,9 +243,7 @@ resource "aws_iam_role_policy" "codebuild" {
   })
 }
 
-# ============================================
 # CloudWatch Log Group para CodeBuild
-# ============================================
 
 resource "aws_cloudwatch_log_group" "codebuild" {
   name              = "/aws/codebuild/${local.name}"
@@ -260,9 +254,7 @@ resource "aws_cloudwatch_log_group" "codebuild" {
   }
 }
 
-# ============================================
 # CodeBuild Project
-# ============================================
 
 resource "aws_codebuild_project" "app" {
   name          = "${local.name}-build"
@@ -323,9 +315,7 @@ resource "aws_codebuild_project" "app" {
   }
 }
 
-# ============================================
 # CodePipeline
-# ============================================
 
 resource "aws_codepipeline" "app" {
   name     = "${local.name}-pipeline"
@@ -401,9 +391,7 @@ resource "aws_codepipeline" "app" {
   }
 }
 
-# ============================================
 # Secrets Manager - GitHub Token
-# ============================================
 
 data "aws_secretsmanager_secret" "github_token" {
   name = var.github_token_secret_name

@@ -47,7 +47,7 @@ echo "Verificando que los valores se resetearon..."
 if grep -q "vpc-PLACEHOLDER" p3-rds-postgres/terraform.tfvars && \
    grep -q "sg-PLACEHOLDER" p3-rds-postgres/terraform.tfvars && \
    grep -q "vpc-PLACEHOLDER" p4-ecs-cluster-task/terraform.tfvars; then
-    echo "✓ terraform.tfvars reseteados correctamente"
+    echo "[OK] terraform.tfvars reseteados correctamente"
 else
     echo "✗ ERROR: terraform.tfvars no se resetearon"
     exit 1
@@ -78,10 +78,10 @@ echo "Probando endpoint /ping..."
 RESPONSE=$(curl -s "http://$ALB_DNS/ping" || echo "ERROR")
 
 if [ "$RESPONSE" = "Ok" ]; then
-    echo "✓ Aplicación funcionando correctamente"
+    echo "[OK] Aplicación funcionando correctamente"
     echo ""
     echo "================================================"
-    echo "  ✓ TEST EXITOSO"
+    echo "  [OK] TEST EXITOSO"
     echo "================================================"
     exit 0
 else

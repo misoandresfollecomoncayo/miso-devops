@@ -41,7 +41,7 @@ if aws secretsmanager describe-secret --secret-id "$SECRET_NAME" --region "$AWS_
         --secret-id "$SECRET_NAME" \
         --secret-string "$GITHUB_TOKEN" \
         --region "$AWS_REGION"
-    log "✓ Secret actualizado"
+    log "[OK] Secret actualizado"
 else
     log "Creando nuevo secret..."
     aws secretsmanager create-secret \
@@ -49,12 +49,12 @@ else
         --description "GitHub Personal Access Token for CodePipeline" \
         --secret-string "$GITHUB_TOKEN" \
         --region "$AWS_REGION"
-    log "✓ Secret creado"
+    log "[OK] Secret creado"
 fi
 
 log ""
 log "=========================================="
-log "✅ GitHub Token Configurado"
+log "[DONE] GitHub Token Configurado"
 log "=========================================="
 log ""
 log "Secret Name: $SECRET_NAME"

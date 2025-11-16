@@ -1,14 +1,6 @@
-# ============================================
-# PASO 2: Amazon ECR (Elastic Container Registry)
-# ============================================
-# Este archivo contiene:
-# 1. Configuración de Terraform y Provider AWS
-# 2. Repositorio ECR para almacenar imágenes Docker
-# 3. Política del ciclo de vida para gestión de imágenes
+# Amazon ECR (Elastic Container Registry)
+# Repositorio para almacenar imágenes Docker con políticas de ciclo de vida
 
-# ============================================
-# 1. Configuración de Terraform
-# ============================================
 terraform {
   required_version = ">= 1.0"
   
@@ -20,13 +12,9 @@ terraform {
   }
 }
 
-# ============================================
-# 2. Configuración del Provider AWS
-# ============================================
 provider "aws" {
   region = var.aws_region
   
-  # Tags por defecto para TODOS los recursos
   default_tags {
     tags = {
       Project     = var.project_name
@@ -37,25 +25,18 @@ provider "aws" {
   }
 }
 
-# ============================================
-# 3. Data Sources
-# ============================================
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-# ============================================
-# 4. Repositorio ECR
-# ============================================
+# Repositorio ECR
 resource "aws_ecr_repository" "app" {
   name                 = "${var.project_name}-${var.environment}"
   image_tag_mutability = var.image_tag_mutability
 
-  # Habilitar escaneo de vulnerabilidades en push
   image_scanning_configuration {
     scan_on_push = var.scan_on_push
   }
 
-  # Cifrado de imágenes
   encryption_configuration {
     encryption_type = "AES256"
   }
@@ -65,10 +46,7 @@ resource "aws_ecr_repository" "app" {
   }
 }
 
-# ============================================
-# 5. Política de ciclo de vida para ECR
-# ============================================
-# Mantiene solo las últimas N imágenes y elimina las antiguas
+# Política de ciclo de vida - mantiene últimas N imágenes
 resource "aws_ecr_lifecycle_policy" "app" {
   repository = aws_ecr_repository.app.name
 
@@ -90,10 +68,7 @@ resource "aws_ecr_lifecycle_policy" "app" {
   })
 }
 
-# ============================================
-# 6. Política de permisos del repositorio (Opcional)
-# ============================================
-# Permite que otras cuentas AWS accedan al repositorio si es necesario
+# Política de acceso cross-account (opcional)
 resource "aws_ecr_repository_policy" "app" {
   count      = var.allow_cross_account_access ? 1 : 0
   repository = aws_ecr_repository.app.name

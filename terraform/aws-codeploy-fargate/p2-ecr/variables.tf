@@ -1,12 +1,8 @@
-# ============================================
 # Variables de entrada para el Paso 2 - ECR
-# ============================================
 # Este archivo SOLO define las variables
 # Los VALORES se asignan en terraform.tfvars
 
-# ============================================
 # Variable: Región de AWS
-# ============================================
 variable "aws_region" {
   description = "Región de AWS donde se desplegarán los recursos"
   type        = string
@@ -18,9 +14,7 @@ variable "aws_region" {
   }
 }
 
-# ============================================
 # Variable: Nombre del proyecto
-# ============================================
 variable "project_name" {
   description = "Nombre del proyecto (se usa como prefijo en recursos)"
   type        = string
@@ -32,9 +26,7 @@ variable "project_name" {
   }
 }
 
-# ============================================
 # Variable: Ambiente
-# ============================================
 variable "environment" {
   description = "Ambiente de despliegue (dev, staging, prod)"
   type        = string
@@ -46,9 +38,7 @@ variable "environment" {
   }
 }
 
-# ============================================
 # Variable: Mutabilidad de tags
-# ============================================
 variable "image_tag_mutability" {
   description = "Mutabilidad de los tags de imagen (MUTABLE o IMMUTABLE)"
   type        = string
@@ -60,18 +50,14 @@ variable "image_tag_mutability" {
   }
 }
 
-# ============================================
 # Variable: Escaneo automático
-# ============================================
 variable "scan_on_push" {
   description = "Habilitar escaneo de vulnerabilidades al hacer push de imagen"
   type        = bool
   default     = true
 }
 
-# ============================================
 # Variable: Cantidad máxima de imágenes
-# ============================================
 variable "max_image_count" {
   description = "Número máximo de imágenes a mantener en el repositorio"
   type        = number
@@ -83,18 +69,14 @@ variable "max_image_count" {
   }
 }
 
-# ============================================
 # Variable: Acceso entre cuentas
-# ============================================
 variable "allow_cross_account_access" {
   description = "Permitir acceso desde otras cuentas AWS"
   type        = bool
   default     = false
 }
 
-# ============================================
 # Variable: IDs de cuentas permitidas
-# ============================================
 variable "allowed_account_ids" {
   description = "Lista de IDs de cuentas AWS con acceso al repositorio"
   type        = list(string)

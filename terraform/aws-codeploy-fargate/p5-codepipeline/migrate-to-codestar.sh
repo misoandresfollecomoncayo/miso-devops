@@ -2,7 +2,7 @@
 
 set -e
 
-echo "🔄 Migrando CodePipeline a CodeStar Connection..."
+echo "[INFO] Migrando CodePipeline a CodeStar Connection..."
 echo ""
 
 # Verificar que la conexión esté AVAILABLE
@@ -13,7 +13,7 @@ CONNECTION_ARN=$(aws codestar-connections list-connections \
   --output text)
 
 if [ -z "$CONNECTION_ARN" ]; then
-  echo "❌ No se encontró la conexión python-app-dev-github"
+  echo "[ERROR] No se encontró la conexión python-app-dev-github"
   echo "Ejecuta primero: ./setup-codestar-connection.sh"
   exit 1
 fi
@@ -24,11 +24,11 @@ STATUS=$(aws codestar-connections get-connection \
   --query 'Connection.ConnectionStatus' \
   --output text)
 
-echo "📊 Estado de conexión: $STATUS"
+echo "[STATUS] Estado de conexión: $STATUS"
 
 if [ "$STATUS" != "AVAILABLE" ]; then
   echo ""
-  echo "❌ La conexión NO está disponible (estado: $STATUS)"
+  echo "[ERROR] La conexión NO está disponible (estado: $STATUS)"
   echo ""
   echo "Debes autorizarla primero:"
   echo "1. Abre: https://console.aws.amazon.com/codesuite/settings/connections?region=us-east-1"
@@ -38,7 +38,7 @@ if [ "$STATUS" != "AVAILABLE" ]; then
   exit 1
 fi
 
-echo "✅ Conexión DISPONIBLE"
+echo "[DONE] Conexión DISPONIBLE"
 echo ""
 echo "📝 Connection ARN: $CONNECTION_ARN"
 echo ""
@@ -46,7 +46,7 @@ echo ""
 # Crear backup del main.tf original
 echo "💾 Creando backup..."
 cp main.tf main.tf.backup-oauth
-echo "✅ Backup creado: main.tf.backup-oauth"
+echo "[DONE] Backup creado: main.tf.backup-oauth"
 echo ""
 
 # Actualizar main.tf
@@ -107,27 +107,27 @@ if ! grep -q "codestar-connections:UseConnection" main.tf; then
 ' main.tf
 fi
 
-echo "✅ main.tf actualizado"
+echo "[DONE] main.tf actualizado"
 echo ""
 
 # Mostrar los cambios
 echo "📋 Verificando cambios..."
 echo ""
 if grep -q "CodeStarSourceConnection" main.tf; then
-  echo "✅ Source provider actualizado a CodeStarSourceConnection"
+  echo "[DONE] Source provider actualizado a CodeStarSourceConnection"
 else
-  echo "❌ Error: No se actualizó el provider"
+  echo "[ERROR] Error: No se actualizó el provider"
   exit 1
 fi
 
 if grep -q "codestar-connections:UseConnection" main.tf; then
-  echo "✅ Permisos de IAM actualizados"
+  echo "[DONE] Permisos de IAM actualizados"
 else
-  echo "⚠️  Advertencia: No se encontraron los permisos IAM"
+  echo "[WARNING]  Advertencia: No se encontraron los permisos IAM"
 fi
 
 echo ""
-echo "🚀 Cambios completados. Próximos pasos:"
+echo "[START] Cambios completados. Próximos pasos:"
 echo ""
 echo "1. Revisar cambios:"
 echo "   git diff main.tf"

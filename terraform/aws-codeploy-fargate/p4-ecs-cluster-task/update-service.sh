@@ -38,7 +38,7 @@ TASK_DEFINITION=$(aws ecs describe-services \
   --query 'services[0].taskDefinition' \
   --output text)
 
-echo -e "${GREEN}✓ Task Definition actual: ${TASK_DEFINITION}${NC}"
+echo -e "${GREEN}[OK] Task Definition actual: ${TASK_DEFINITION}${NC}"
 
 # Paso 2: Crear nueva revisión de la Task Definition
 echo -e "\n${BLUE}[2/4] Creando nueva revisión de Task Definition...${NC}"
@@ -59,7 +59,7 @@ NEW_TASK_ARN=$(aws ecs register-task-definition \
   --query 'taskDefinition.taskDefinitionArn' \
   --output text)
 
-echo -e "${GREEN}✓ Nueva Task Definition creada: ${NEW_TASK_ARN}${NC}"
+echo -e "${GREEN}[OK] Nueva Task Definition creada: ${NEW_TASK_ARN}${NC}"
 
 # Paso 3: Verificar deployment controller
 echo -e "\n${BLUE}[3/4] Verificando deployment controller...${NC}"
@@ -73,14 +73,14 @@ DEPLOYMENT_CONTROLLER=$(aws ecs describe-services \
 echo -e "${YELLOW}Deployment Controller: ${DEPLOYMENT_CONTROLLER}${NC}"
 
 if [ "${DEPLOYMENT_CONTROLLER}" == "CODE_DEPLOY" ]; then
-  echo -e "\n${YELLOW}⚠️  El servicio usa CODE_DEPLOY como deployment controller${NC}"
+  echo -e "\n${YELLOW}[WARNING]  El servicio usa CODE_DEPLOY como deployment controller${NC}"
   echo -e "${YELLOW}No se puede actualizar directamente con ECS.${NC}\n"
   
   echo -e "${BLUE}Opciones:${NC}"
   echo -e "  1. Usar AWS CodeDeploy para hacer despliegue Blue/Green"
   echo -e "  2. Recrear el servicio sin CodeDeploy (solo para desarrollo)\n"
   
-  echo -e "${GREEN}✓ Nueva Task Definition creada: ${NEW_TASK_ARN}${NC}"
+  echo -e "${GREEN}[OK] Nueva Task Definition creada: ${NEW_TASK_ARN}${NC}"
   echo -e "${BLUE}Esta Task Definition está lista para usar con CodeDeploy${NC}\n"
   
   echo -e "${YELLOW}Para hacer el despliegue, necesitas configurar CodeDeploy primero.${NC}"
@@ -100,7 +100,7 @@ aws ecs update-service \
   --query 'service.{Name:serviceName,Status:status,DesiredCount:desiredCount,RunningCount:runningCount}' \
   --output table
 
-echo -e "${GREEN}✓ Servicio actualizado${NC}"
+echo -e "${GREEN}[OK] Servicio actualizado${NC}"
 
 # Obtener URL del ALB
 ALB_URL=$(aws elbv2 describe-load-balancers \
@@ -111,7 +111,7 @@ ALB_URL=$(aws elbv2 describe-load-balancers \
 
 # Resumen final
 echo -e "\n${GREEN}================================================${NC}"
-echo -e "${GREEN}  ✓ Task Definition actualizada${NC}"
+echo -e "${GREEN}  [OK] Task Definition actualizada${NC}"
 echo -e "${GREEN}================================================${NC}"
 echo -e "\nNueva Task Definition: ${NEW_TASK_ARN}"
 echo -e "\nAccede a tu aplicación en:"

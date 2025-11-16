@@ -35,10 +35,10 @@ GREEN_TG_NAME=$(terraform output -raw green_target_group_name 2>/dev/null) || er
 PROD_LISTENER_ARN=$(terraform output -raw http_listener_arn 2>/dev/null) || error "No se pudo obtener http_listener_arn"
 TEST_LISTENER_ARN=$(terraform output -raw test_listener_arn 2>/dev/null) || error "No se pudo obtener test_listener_arn"
 
-log "✓ Cluster: $CLUSTER_NAME"
-log "✓ Service: $SERVICE_NAME"
-log "✓ Blue TG: $BLUE_TG_NAME"
-log "✓ Green TG: $GREEN_TG_NAME"
+log "[OK] Cluster: $CLUSTER_NAME"
+log "[OK] Service: $SERVICE_NAME"
+log "[OK] Blue TG: $BLUE_TG_NAME"
+log "[OK] Green TG: $GREEN_TG_NAME"
 
 # Crear CodeDeploy Application
 log "Creando CodeDeploy Application..."
@@ -54,7 +54,7 @@ ROLE_NAME="${PROJECT_NAME}-${ENVIRONMENT}-codedeploy-role"
 
 # Verificar si el rol ya existe
 if aws iam get-role --role-name $ROLE_NAME --region $AWS_REGION 2>/dev/null; then
-    log "✓ Role $ROLE_NAME ya existe"
+    log "[OK] Role $ROLE_NAME ya existe"
 else
     # Crear trust policy
     cat > /tmp/codedeploy-trust-policy.json << EOF
@@ -83,12 +83,12 @@ EOF
         --policy-arn arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS \
         --region $AWS_REGION
 
-    log "✓ Role creado"
+    log "[OK] Role creado"
 fi
 
 # Obtener ARN del rol
 ROLE_ARN=$(aws iam get-role --role-name $ROLE_NAME --query 'Role.Arn' --output text --region $AWS_REGION)
-log "✓ Role ARN: $ROLE_ARN"
+log "[OK] Role ARN: $ROLE_ARN"
 
 # Esperar a que el rol esté disponible
 sleep 5
@@ -151,11 +151,11 @@ EOF
 aws deploy create-deployment-group \
     --cli-input-json file:///tmp/deployment-group-config.json \
     --region $AWS_REGION \
-    2>/dev/null && log "✓ Deployment Group creado" || log "Deployment Group ya existe"
+    2>/dev/null && log "[OK] Deployment Group creado" || log "Deployment Group ya existe"
 
 log ""
 log "=========================================="
-log "✅ CodeDeploy Configurado"
+log "[DONE] CodeDeploy Configurado"
 log "=========================================="
 log ""
 log "Application Name: ${PROJECT_NAME}-${ENVIRONMENT}-app"

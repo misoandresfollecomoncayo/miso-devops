@@ -2,7 +2,7 @@
 # ============================================
 # Script para recrear servicio ECS sin CodeDeploy
 # ============================================
-# ⚠️ SOLO PARA DESARROLLO/TESTING
+# [WARNING] SOLO PARA DESARROLLO/TESTING
 # Este script elimina y recrea el servicio con deployment controller ECS
 # (en lugar de CODE_DEPLOY) para poder actualizarlo directamente.
 
@@ -16,7 +16,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${RED}================================================${NC}"
-echo -e "${RED}  ⚠️  RECREAR SERVICIO SIN CODEDEPLOY${NC}"
+echo -e "${RED}  [WARNING]  RECREAR SERVICIO SIN CODEDEPLOY${NC}"
 echo -e "${RED}================================================${NC}"
 echo -e "${YELLOW}Este script es SOLO para desarrollo/testing${NC}"
 echo -e "${YELLOW}Eliminará el servicio actual y lo recreará sin CodeDeploy${NC}\n"
@@ -53,7 +53,7 @@ aws ecs delete-service \
   --region ${REGION} \
   --force >/dev/null 2>&1 || true
 
-echo -e "${GREEN}✓ Servicio eliminado${NC}"
+echo -e "${GREEN}[OK] Servicio eliminado${NC}"
 echo -e "${YELLOW}Esperando 30 segundos para que se complete la eliminación...${NC}"
 sleep 30
 
@@ -118,7 +118,7 @@ aws ecs create-service \
   --query 'service.{Name:serviceName,Status:status,DesiredCount:desiredCount}' \
   --output table
 
-echo -e "${GREEN}✓ Servicio creado${NC}"
+echo -e "${GREEN}[OK] Servicio creado${NC}"
 
 # Paso 5: Esperar a que esté estable
 echo -e "\n${BLUE}[5/5] Esperando a que el servicio esté estable...${NC}"
@@ -129,7 +129,7 @@ aws ecs wait services-stable \
   --services ${SERVICE_NAME} \
   --region ${REGION}
 
-echo -e "\n${GREEN}✓ Servicio estable${NC}"
+echo -e "\n${GREEN}[OK] Servicio estable${NC}"
 
 # Mostrar estado final
 echo -e "\n${BLUE}Estado del servicio:${NC}"
@@ -149,7 +149,7 @@ ALB_URL=$(aws elbv2 describe-load-balancers \
 
 # Resumen final
 echo -e "\n${GREEN}================================================${NC}"
-echo -e "${GREEN}  ✓ Servicio recreado exitosamente${NC}"
+echo -e "${GREEN}  [OK] Servicio recreado exitosamente${NC}"
 echo -e "${GREEN}================================================${NC}"
 echo -e "\nDeployment Controller: ${YELLOW}ECS${NC} (ya no es CODE_DEPLOY)"
 echo -e "\nAhora puedes actualizar directamente con:"
