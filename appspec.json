@@ -8,7 +8,7 @@
           "TaskDefinition": "<TASK_DEFINITION>",
           "LoadBalancerInfo": {
             "ContainerName": "python-app",
-            "ContainerPort": 5000
+            "ContainerPort": 5001
           },
           "PlatformVersion": "LATEST"
         }
