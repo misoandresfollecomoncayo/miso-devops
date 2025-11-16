@@ -1,97 +1,70 @@
-# Paso 2: Amazon ECR - Elastic Container Registry
+# Paso 2: Amazon ECR
 
-Este paso crea un repositorio en Amazon ECR para almacenar las imágenes Docker de tu aplicación.
+Repositorio de contenedores para almacenar imágenes Docker de la aplicación con políticas de ciclo de vida y escaneo de vulnerabilidades.
 
-## 📦 Recursos que se crean
+## Recursos Creados
 
-- **Repositorio ECR**: Para almacenar imágenes Docker
-- **Política de ciclo de vida**: Mantiene solo las últimas 10 imágenes
-- **Escaneo de vulnerabilidades**: Automático al hacer push
-- **Cifrado**: AES256 para las imágenes
+- **Repositorio ECR**: `python-app-dev`
+- **Lifecycle Policy**: Mantiene últimas 10 imágenes, elimina antiguas
+- **Image Scanning**: Escaneo automático de vulnerabilidades al push
+- **Encryption**: AES256 para todas las imágenes
 
-## 🚀 Instrucciones de uso
+## Uso
 
-### 1. Inicializar Terraform
+### Despliegue
 
 ```bash
-cd terraform/aws-codeploy-fargate/p2-ecr
 terraform init
-```
-
-### 2. Revisar el plan
-
-```bash
 terraform plan
-```
-
-### 3. Aplicar cambios
-
-```bash
 terraform apply
 ```
 
-### 4. Ver los comandos Docker
+### Build y Push de Imagen Docker
+
+Opción 1: Script automatizado (recomendado)
 
 ```bash
-terraform output docker_commands
+./rebuild-and-push.sh
 ```
 
-## 📋 Construir y pushear imagen Docker
-
-Después de aplicar Terraform, sigue estos pasos:
-
-### 1. Autenticarse en ECR
+Opción 2: Manual
 
 ```bash
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com
+# 1. Autenticación
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin \
+  $(terraform output -raw repository_url)
+
+# 2. Build para linux/amd64 (requerido para Fargate)
+docker buildx build --platform linux/amd64 \
+  -t $(terraform output -raw repository_url):latest \
+  -f ../../Dockerfile \
+  ../../
+
+# 3. Push
+docker push $(terraform output -raw repository_url):latest
 ```
 
-### 2. Construir la imagen
+## Outputs
 
-```bash
-cd /Users/usuari/Documents/Uniandes_temp/miso-devops
-docker build -t python-app-dev .
+- `repository_url` - URL completa del repositorio
+- `repository_arn` - ARN del repositorio
+- `docker_commands` - Comandos listos para copiar/pegar
+
+## Variables
+
+```hcl
+project_name         = "python-app"
+environment          = "dev"
+max_image_count      = 10            # Límite de imágenes
 ```
 
-### 3. Etiquetar la imagen
+## Costos
+
+Storage: $0.10/GB/mes (ejemplo: 1GB = ~$0.10/mes)
+
+## Limpieza
 
 ```bash
-# Obtén la URL del repositorio
-REPO_URL=$(terraform output -raw repository_url)
-
-# Etiqueta la imagen
-docker tag python-app-dev:latest $REPO_URL:latest
-```
-
-### 4. Pushear a ECR
-
-```bash
-docker push $REPO_URL:latest
-```
-
-## 🔍 Verificación
-
-1. Ve a la consola de AWS ECR
-2. Busca el repositorio `python-app-dev`
-3. Verifica que la imagen esté cargada
-4. Revisa el resultado del escaneo de vulnerabilidades
-
-## 📝 Notas importantes
-
-- El repositorio mantiene solo las últimas 10 imágenes (configurable)
-- Las imágenes se escanean automáticamente en busca de vulnerabilidades
-- Los tags son MUTABLES (puedes sobrescribir tags existentes)
-- Las imágenes están cifradas con AES256
-
-## 🗑️ Destruir recursos
-
-```bash
-# ⚠️ CUIDADO: Esto eliminará el repositorio Y TODAS LAS IMÁGENES
 terraform destroy
 ```
-
-## 💡 Tips
-
-- Usa tags semánticos para tus imágenes: `v1.0.0`, `v1.0.1`, etc.
-- También puedes usar el commit SHA: `abc123def`
-- Ejemplo: `docker tag app:latest $REPO_URL:v1.0.0`

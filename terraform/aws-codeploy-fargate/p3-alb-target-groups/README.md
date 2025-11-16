@@ -1,107 +1,67 @@
-# Paso 3: Application Load Balancer y Target Groups
+# Paso 3: VPC, ALB y Target Groups
 
-Este paso crea el Application Load Balancer (ALB) y los Target Groups necesarios para el despliegue Blue/Green con CodeDeploy.
+Infraestructura de red completa con VPC, subnets públicas, Application Load Balancer y Target Groups para despliegues Blue/Green.
 
-## 📦 Recursos que se crean
+## Recursos Creados
 
-### Load Balancer
-- **Application Load Balancer**: Balanceador de carga en 2 zonas de disponibilidad
+### Red
+- **VPC**: 10.0.0.0/16 con DNS habilitado
+- **Subnets públicas**: 2 subnets en diferentes AZs (10.0.1.0/24, 10.0.2.0/24)
+- **Internet Gateway**: Para acceso público
+- **Route Tables**: Tablas de ruteo con rutas a IGW
 
-### Target Groups
-- **Blue Target Group**: Para el ambiente de producción (activo)
-- **Green Target Group**: Para el ambiente de staging (despliegue Blue/Green)
+### Seguridad
+- **ALB Security Group**: Permite tráfico HTTP (80, 8080) desde internet
+- **ECS Tasks Security Group**: Permite tráfico desde ALB
 
-### Listeners
-- **HTTP Listener (Puerto 80)**: Tráfico de producción → Blue Target Group
-- **Test Listener (Puerto 8080)**: Tráfico de test → Green Target Group
+### Load Balancing
+- **Application Load Balancer**: Balanceador público
+- **Target Group Blue**: Puerto 80 (producción)
+- **Target Group Green**: Puerto 8080 (test/staging)
+- **Listeners HTTP**: Puertos 80 y 8080
 
-## ⚠️ Prerequisitos
-
-**IMPORTANTE**: Antes de ejecutar este paso, debes crear primero la VPC y subnets. Ejecuta:
+## Uso
 
 ```bash
-# Primero crea la VPC (si no lo has hecho)
-cd ../p2-vpc-network
 terraform init
-terraform apply
-```
-
-## 🚀 Instrucciones de uso
-
-### 1. Inicializar Terraform
-
-```bash
-cd terraform/aws-codeploy-fargate/p3-alb-target-groups
-terraform init
-```
-
-### 2. Revisar el plan
-
-```bash
 terraform plan
-```
-
-### 3. Aplicar cambios
-
-```bash
 terraform apply
 ```
 
-### 4. Obtener la URL del ALB
+## Outputs
 
-```bash
-terraform output application_url
+- `vpc_id` - ID de la VPC creada
+- `public_subnet_ids` - IDs de subnets públicas
+- `alb_dns_name` - DNS del balanceador (URL de acceso)
+- `alb_arn` - ARN del ALB
+- `target_group_blue_arn` - ARN del TG Blue (producción)
+- `target_group_green_arn` - ARN del TG Green (test)
+- `ecs_tasks_security_group_id` - SG para ECS tasks
+
+## Variables
+
+```hcl
+project_name          = "python-app"
+environment           = "dev"
+vpc_cidr              = "10.0.0.0/16"
+public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
 ```
 
-## 📋 Configuración
+## Acceso
 
-Edita el archivo `terraform.tfvars` para personalizar:
-- `project_name`: DEBE coincidir con el paso 2 (VPC)
-- `environment`: DEBE coincidir con el paso 2 (VPC)
-- `app_port`: Puerto donde escucha tu aplicación (5000 por defecto)
-- `health_check_path`: Ruta para el health check (/ por defecto)
+Después del despliegue:
 
-## 🔍 Verificación
+- **Producción (Blue)**: http://ALB_DNS_NAME
+- **Test (Green)**: http://ALB_DNS_NAME:8080
 
-Después de aplicar:
+## Costos
 
-1. Ve a la consola de AWS EC2 → Load Balancers
-2. Verifica que exista el ALB con el nombre `{project_name}-{environment}-alb`
-3. Revisa los Target Groups (ambos deben estar vacíos inicialmente)
-4. Verifica los Listeners (puerto 80 y 8080)
+- ALB: ~$20/mes
+- VPC/Subnets: Gratis
+- Internet Gateway: Gratis
 
-### Probar el ALB
-
-```bash
-# Obtener la URL
-ALB_URL=$(terraform output -raw application_url)
-
-# Probar (fallará hasta que despliegues ECS)
-curl $ALB_URL
-```
-
-## 📊 Despliegue Blue/Green
-
-El ALB está configurado para soportar despliegues Blue/Green:
-
-- **Puerto 80 (Producción)**: Apunta al Target Group Blue
-- **Puerto 8080 (Test)**: Apunta al Target Group Green
-
-Durante un despliegue:
-1. La nueva versión se despliega en Green
-2. Se prueba en el puerto 8080
-3. CodeDeploy intercambia los target groups
-4. La nueva versión queda en producción (puerto 80)
-
-## 🗑️ Destruir recursos
+## Limpieza
 
 ```bash
 terraform destroy
 ```
-
-## 💡 Tips
-
-- El health check está configurado para 30 segundos de intervalo
-- El deregistration delay es de 30 segundos
-- Los Target Groups son de tipo `ip` (necesario para Fargate)
-- El ALB está en modo público (internet-facing)

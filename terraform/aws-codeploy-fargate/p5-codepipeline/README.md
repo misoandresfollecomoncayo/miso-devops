@@ -1,10 +1,10 @@
 # Paso 5 - AWS CodePipeline con Blue/Green Deployment
 
-## 📋 Descripción
+##  Descripción
 
 Este paso configura AWS CodePipeline para automatizar el flujo completo de CI/CD desde GitHub hasta el deployment en ECS Fargate con estrategia Blue/Green.
 
-## 🏗️ Arquitectura del Pipeline
+##  Arquitectura del Pipeline
 
 ```
 GitHub → CodePipeline → CodeBuild → CodeDeploy → ECS Fargate
@@ -12,7 +12,7 @@ GitHub → CodePipeline → CodeBuild → CodeDeploy → ECS Fargate
  Source    Orchestration  Build&Test  Blue/Green  Running App
 ```
 
-## 📦 Recursos Creados
+##  Recursos Creados
 
 - **CodePipeline**: Orquesta todo el flujo de CI/CD
 - **CodeBuild Project**: Ejecuta tests, build Docker y push a ECR
@@ -20,7 +20,7 @@ GitHub → CodePipeline → CodeBuild → CodeDeploy → ECS Fargate
 - **IAM Roles**: Permisos para CodePipeline y CodeBuild
 - **CloudWatch Logs**: Logs de CodeBuild
 
-## 🔄 Etapas del Pipeline
+##  Etapas del Pipeline
 
 ### 1. Source (GitHub)
 - Detecta cambios en el repositorio
@@ -45,7 +45,7 @@ GitHub → CodePipeline → CodeBuild → CodeDeploy → ECS Fargate
 - Cambia tráfico de Blue a Green
 - Termina tasks antiguas después de 5 minutos
 
-## 🚀 Configuración
+##  Configuración
 
 ### Prerequisitos
 
@@ -54,12 +54,12 @@ GitHub → CodePipeline → CodeBuild → CodeDeploy → ECS Fargate
    - [Crear token aquí](https://github.com/settings/tokens)
 
 2. **Pasos anteriores completados**:
-   - ✅ p1-iam-roles
-   - ✅ p2-ecr
-   - ✅ p3-alb-target-groups
-   - ✅ p3-rds-postgres
-   - ✅ p4-ecs-cluster-task
-   - ✅ CodeDeploy configurado (setup-codedeploy.sh)
+   - p1-iam-roles
+   - p2-ecr
+   - p3-alb-target-groups
+   - p3-rds-postgres
+   - p4-ecs-cluster-task
+   - CodeDeploy configurado (setup-codedeploy.sh)
 
 ### Paso 1: Configurar GitHub Token
 
@@ -96,7 +96,7 @@ terraform apply
 
 Tiempo estimado: 2-3 minutos
 
-## ✅ Verificación
+##  Verificación
 
 ### Ver el Pipeline creado
 
@@ -148,7 +148,7 @@ curl http://<alb-dns>/ping
 curl http://<alb-dns>:8080/ping
 ```
 
-## 📊 Variables de Entorno en CodeBuild
+##  Variables de Entorno en CodeBuild
 
 El proyecto de CodeBuild incluye estas variables:
 
@@ -205,7 +205,7 @@ aws logs tail /ecs/python-app-dev --follow
 2. Ejecutar `./setup-github-token.sh` nuevamente
 3. Recrear el pipeline: `terraform destroy && terraform apply`
 
-## 🎯 Flujo Completo del Deployment
+##  Flujo Completo del Deployment
 
 ```
 1. Developer hace push a main
@@ -237,7 +237,7 @@ aws logs tail /ecs/python-app-dev --follow
    ├─ Espera 5 minutos
    └─ Termina BLUE tasks
    ↓
-6. ✅ Deployment completado
+6. Deployment completado
    └─ Nueva versión corriendo sin downtime
 ```
 
@@ -267,7 +267,7 @@ aws codepipeline list-pipeline-executions \
     --region us-east-1
 ```
 
-## 🔐 Seguridad
+##  Seguridad
 
 ### Secrets Manager
 - GitHub token encriptado en reposo
@@ -285,7 +285,7 @@ aws codepipeline list-pipeline-executions \
 - Roles separados para Pipeline y Build
 - PassRole permissions controladas
 
-## 🔄 Rollback
+##  Rollback
 
 Si un deployment falla, CodeDeploy automáticamente:
 1. Detiene el proceso
@@ -320,10 +320,10 @@ aws deploy create-deployment \
 
 ## 🎓 Próximos Pasos
 
-1. ✅ Hacer un cambio en el código
-2. ✅ Push a GitHub
-3. ✅ Ver pipeline ejecutarse automáticamente
-4. ✅ Verificar deployment Blue/Green
+1. Hacer un cambio en el código
+2. Push a GitHub
+3. Ver pipeline ejecutarse automáticamente
+4. Verificar deployment Blue/Green
 5. ⏳ Configurar notificaciones (SNS)
 6. ⏳ Agregar stage de aprobación manual
 7. ⏳ Configurar múltiples ambientes (dev, staging, prod)

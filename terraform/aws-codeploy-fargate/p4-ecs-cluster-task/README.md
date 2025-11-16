@@ -2,7 +2,7 @@
 
 Este paso crea el Cluster ECS y la Task Definition necesaria para ejecutar la aplicación en Fargate.
 
-## 📦 Recursos que se crean
+##  Recursos que se crean
 
 ### ECS Cluster
 - **Cluster ECS**: Cluster con Container Insights habilitado
@@ -21,14 +21,14 @@ Este paso crea el Cluster ECS y la Task Definition necesaria para ejecutar la ap
 ### CloudWatch
 - **Log Group**: Para los logs de la aplicación
 
-## ⚠️ Prerequisitos
+##  Prerequisitos
 
 Debes tener:
-1. ✅ Repositorio ECR creado (Paso 2)
-2. ✅ Imagen Docker subida a ECR
+1. Repositorio ECR creado (Paso 2)
+2. Imagen Docker subida a ECR
 3. Base de datos RDS disponible (actualizar en terraform.tfvars)
 
-## 🚀 Instrucciones de uso
+##  Instrucciones de uso
 
 ### 1. Configurar variables
 
@@ -56,7 +56,7 @@ terraform plan
 terraform apply
 ```
 
-## 📋 Configuración de Task Definition
+##  Configuración de Task Definition
 
 La Task Definition incluye:
 
@@ -88,14 +88,14 @@ aws logs tail /ecs/python-app-dev --follow
 - Los logs se guardan en CloudWatch con retención de 7 días
 - La imagen debe existir en ECR antes de crear el servicio
 
-## 🔐 Seguridad
+##  Seguridad
 
-⚠️ **IMPORTANTE**: 
+****IMPORTANTE**: 
 - La contraseña de la base de datos está en texto plano en `terraform.tfvars`
 - Para producción, usa AWS Secrets Manager o Parameter Store
 - No subas `terraform.tfvars` al control de versiones
 
-## 🗑️ Destruir recursos
+##  Destruir recursos
 
 ```bash
 terraform destroy
