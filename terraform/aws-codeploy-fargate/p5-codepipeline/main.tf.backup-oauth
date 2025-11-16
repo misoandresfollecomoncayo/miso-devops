@@ -27,11 +27,6 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-# CodeStar Connection para GitHub
-data "aws_codestarconnections_connection" "github" {
-  name = "python-app-dev-github"
-}
-
 locals {
   account_id = data.aws_caller_identity.current.account_id
   region     = data.aws_region.current.name
@@ -142,13 +137,6 @@ resource "aws_iam_role_policy" "codepipeline" {
           "codedeploy:RegisterApplicationRevision"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "codestar-connections:UseConnection"
-        ]
-        Resource = data.aws_codestarconnections_connection.github.arn
       },
       {
         Effect = "Allow"
@@ -342,16 +330,16 @@ resource "aws_codepipeline" "app" {
     action {
       name             = "Source"
       category         = "Source"
-      owner            = "AWS"
-      provider         = "CodeStarSourceConnection"
+      owner            = "ThirdParty"
+      provider         = "GitHub"
       version          = "1"
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn    = data.aws_codestarconnections_connection.github.arn
-        FullRepositoryId = var.github_repo
-        BranchName       = var.github_branch
-        DetectChanges    = true
+        Owner      = split("/", var.github_repo)[0]
+        Repo       = split("/", var.github_repo)[1]
+        Branch     = var.github_branch
+        OAuthToken = data.aws_secretsmanager_secret_version.github_token.secret_string
       }
     }
   }
