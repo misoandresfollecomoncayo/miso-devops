@@ -18,7 +18,7 @@ def test_ping(client):
     """Test del endpoint /ping sin conexión a BD"""
     response = client.get('/ping')
     assert response.status_code == 200
-    assert response.data == b'Ok'
+    assert response.data == b'Ok Nuevo fargate'
 
 def test_blacklists_success_with_mock(client):
     with patch('routes.db.session.add') as mock_add, \
