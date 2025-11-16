@@ -10,7 +10,7 @@ phases:
     commands:
       - echo Running unit tests...
       - export TESTING=true
-      - pytest -v src/test/test.py --maxfail=1 --disable-warnings -q || (echo "Tests failed" && exit 1)
+      - python -m pytest src/test/test.py
       - echo All tests passed successfully
       - echo Logging in to Amazon ECR...
       - aws --version
