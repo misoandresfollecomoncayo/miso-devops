@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+import os
 
 db = SQLAlchemy()
 
@@ -8,6 +9,11 @@ def create_database_if_not_exists(db_name='miso_devops_blacklists', db_user='pos
     """
     Crea la base de datos PostgreSQL si no existe.
     """
+    # Skip en modo testing
+    if os.getenv('TESTING') == 'true':
+        print("⚠️  Skipping database creation in TESTING mode")
+        return
+    
     try:
         # Conectar a la base de datos 'postgres' por defecto
         conn = psycopg2.connect(

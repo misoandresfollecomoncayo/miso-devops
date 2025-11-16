@@ -9,6 +9,7 @@ phases:
   pre_build:
     commands:
       - echo Running unit tests...
+      - export TESTING=true
       - pytest -v src/test/test.py --maxfail=1 --disable-warnings -q || (echo "Tests failed" && exit 1)
       - echo All tests passed successfully
       - echo Logging in to Amazon ECR...
