@@ -7,9 +7,9 @@ project_name = "python-app"
 environment  = "dev"
 
 # Networking (valores del paso 3)
-vpc_id = "vpc-03c5511735044c4ba"
-subnet_ids = ["subnet-0b8b956318668c8ee", "subnet-05fdc8410fdc2d81e"]
-ecs_tasks_security_group_id = "sg-07de55655900433ee"
+vpc_id = "vpc-PLACEHOLDER"
+subnet_ids = ["subnet-PLACEHOLDER1", "subnet-PLACEHOLDER2"]
+ecs_tasks_security_group_id = "sg-PLACEHOLDER"
 
 # CloudWatch Logs
 log_retention_days = 7

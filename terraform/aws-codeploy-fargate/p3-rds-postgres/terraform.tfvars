@@ -3,8 +3,8 @@ project_name = "python-app"
 environment  = "dev"
 
 # Network (valores del paso 3)
-vpc_id = "vpc-03c5511735044c4ba"
-ecs_tasks_security_group_id = "sg-07de55655900433ee"
+vpc_id = "vpc-PLACEHOLDER"
+ecs_tasks_security_group_id = "sg-PLACEHOLDER"
 
 # Database
 postgres_version    = "15.15"
