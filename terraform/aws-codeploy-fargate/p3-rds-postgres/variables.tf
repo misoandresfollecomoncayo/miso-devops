@@ -1,6 +1,4 @@
-# ============================================
 # Variables para RDS PostgreSQL
-# ============================================
 
 variable "aws_region" {
   description = "Región de AWS"
@@ -20,9 +18,7 @@ variable "environment" {
   default     = "dev"
 }
 
-# ============================================
 # Database Configuration
-# ============================================
 
 variable "postgres_version" {
   description = "Versión de PostgreSQL"
@@ -61,9 +57,7 @@ variable "db_password" {
   default     = "postgres123"
 }
 
-# ============================================
 # Network & Security
-# ============================================
 
 variable "vpc_id" {
   description = "ID de la VPC donde se creará RDS"
@@ -87,9 +81,7 @@ variable "multi_az" {
   default     = false
 }
 
-# ============================================
 # Backup & Maintenance
-# ============================================
 
 variable "backup_retention_period" {
   description = "Días de retención de backups"

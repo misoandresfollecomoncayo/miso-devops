@@ -1,18 +1,6 @@
-# ============================================
-# PASO 3: VPC, Networking, ALB y Target Groups
-# ============================================
-# Este archivo contiene:
-# 1. Configuración de Terraform y Provider AWS
-# 2. VPC y Subnets
-# 3. Internet Gateway y Route Tables
-# 4. Security Groups (ALB y ECS Tasks)
-# 5. Application Load Balancer (ALB)
-# 6. Dos Target Groups (Blue y Green para despliegue Blue/Green)
-# 7. Listeners HTTP
+# VPC, Networking, ALB y Target Groups
+# Infraestructura de red y balanceadores para despliegue Blue/Green
 
-# ============================================
-# 1. Configuración de Terraform
-# ============================================
 terraform {
   required_version = ">= 1.0"
   
@@ -24,13 +12,9 @@ terraform {
   }
 }
 
-# ============================================
-# 2. Configuración del Provider AWS
-# ============================================
 provider "aws" {
   region = var.aws_region
   
-  # Tags por defecto para TODOS los recursos
   default_tags {
     tags = {
       Project     = var.project_name
@@ -41,9 +25,6 @@ provider "aws" {
   }
 }
 
-# ============================================
-# 3. Data Sources
-# ============================================
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
@@ -51,9 +32,7 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# ============================================
 # 4. VPC
-# ============================================
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
@@ -64,9 +43,7 @@ resource "aws_vpc" "main" {
   }
 }
 
-# ============================================
 # 5. Internet Gateway
-# ============================================
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -75,9 +52,7 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-# ============================================
 # 6. Subnets Públicas (2 AZs para alta disponibilidad)
-# ============================================
 resource "aws_subnet" "public" {
   count = length(var.public_subnet_cidrs)
 
@@ -92,9 +67,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-# ============================================
 # 7. Route Table para Subnets Públicas
-# ============================================
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -115,9 +88,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# ============================================
 # 8. Security Group para ALB
-# ============================================
 resource "aws_security_group" "alb" {
   name        = "${var.project_name}-${var.environment}-alb-sg"
   description = "Security group para Application Load Balancer"
@@ -155,9 +126,7 @@ resource "aws_security_group" "alb" {
   }
 }
 
-# ============================================
 # 9. Security Group para ECS Tasks
-# ============================================
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.project_name}-${var.environment}-ecs-tasks-sg"
   description = "Security group para ECS Tasks"
@@ -186,9 +155,7 @@ resource "aws_security_group" "ecs_tasks" {
   }
 }
 
-# ============================================
 # 10. Application Load Balancer
-# ============================================
 resource "aws_lb" "main" {
   name               = "${var.project_name}-${var.environment}-alb"
   internal           = false
@@ -205,9 +172,7 @@ resource "aws_lb" "main" {
   }
 }
 
-# ============================================
 # 11. Target Group Blue (Producción)
-# ============================================
 resource "aws_lb_target_group" "blue" {
   name        = "${var.project_name}-${var.environment}-blue-tg"
   port        = var.app_port
@@ -233,9 +198,7 @@ resource "aws_lb_target_group" "blue" {
   }
 }
 
-# ============================================
 # 12. Target Group Green (Staging para Blue/Green)
-# ============================================
 resource "aws_lb_target_group" "green" {
   name        = "${var.project_name}-${var.environment}-green-tg"
   port        = var.app_port
@@ -261,9 +224,7 @@ resource "aws_lb_target_group" "green" {
   }
 }
 
-# ============================================
 # 13. Listener HTTP en puerto 80 (Producción - Blue)
-# ============================================
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = "80"
@@ -279,9 +240,7 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-# ============================================
 # 14. Listener de Test en puerto 8080 (para validar Green)
-# ============================================
 resource "aws_lb_listener" "test" {
   load_balancer_arn = aws_lb.main.arn
   port              = "8080"

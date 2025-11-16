@@ -1,75 +1,56 @@
-# PASO 1: Roles IAM para CodeDeploy-ECS
+# Paso 1: Roles IAM para CodeDeploy
 
-## 🎯 Objetivo
+Configuración de roles y políticas IAM necesarios para que AWS CodeDeploy pueda gestionar despliegues Blue/Green en Amazon ECS.
 
-Crear el rol IAM que permitirá a AWS CodeDeploy realizar despliegues Blue/Green en Amazon ECS.
+## Recursos Creados
 
-## 📋 ¿Qué se crea?
+- **IAM Role**: `python-app-dev-codedeploy-ecs-role`
+- **Políticas adjuntas**:
+  - `AWSCodeDeployRoleForECS` - Permisos básicos de CodeDeploy para ECS
+  - `ElasticLoadBalancingFullAccess` - Gestión de Load Balancers durante despliegues
+  - `AmazonECS_FullAccess` - Acceso completo a ECS para gestionar servicios y tasks
 
-1. **IAM Role**: `python-app-dev-codedeploy-ecs-role`
-2. **3 Políticas adjuntas**:
-   - AWSCodeDeployRoleForECS
-   - ElasticLoadBalancingFullAccess
-   - AmazonECS_FullAccess
+## Uso
 
-## 🚀 Cómo usar
+### Despliegue
 
-### 1. Configurar variables
-
-Edita `terraform.tfvars` con tus valores:
-```bash
-nano terraform.tfvars
-```
-
-### 2. Inicializar Terraform
 ```bash
 terraform init
-```
-
-### 3. Ver el plan
-```bash
 terraform plan
-```
-
-### 4. Aplicar cambios
-```bash
 terraform apply
 ```
 
-### 5. Ver resultados
+### Verificación
+
 ```bash
+# Ver outputs
 terraform output
-```
 
-## 📊 Recursos creados
-
-- 1 IAM Role
-- 3 Policy Attachments
-
-**Costo:** $0.00 (IAM es gratuito)
-
-## ✅ Verificación
-
-Verifica el rol en AWS Console:
-[Ver rol en IAM](https://console.aws.amazon.com/iam/home#/roles)
-
-O con AWS CLI:
-```bash
+# Verificar rol en AWS
 aws iam get-role --role-name python-app-dev-codedeploy-ecs-role
 ```
 
-## 🔄 Siguientes pasos
+## Outputs
 
-Una vez completado, guarda el ARN del rol:
-```bash
-terraform output codedeploy_role_arn
+- `codedeploy_role_arn` - ARN del rol (necesario para configurar CodeDeploy)
+- `codedeploy_role_name` - Nombre del rol
+
+## Variables
+
+Configura en `terraform.tfvars`:
+
+```hcl
+project_name = "python-app"  # Nombre del proyecto
+environment  = "dev"         # Entorno (dev, staging, prod)
+aws_region   = "us-east-1"   # Región de AWS
 ```
 
-Lo necesitarás en el **Paso 7: CodeDeploy**.
+## Costos
 
-## 🧹 Limpieza
+IAM Roles y Policies no tienen costo.
 
-Para eliminar el rol:
+## Limpieza
+
 ```bash
 terraform destroy
 ```

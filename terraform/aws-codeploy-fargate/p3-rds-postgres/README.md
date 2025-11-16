@@ -1,8 +1,8 @@
-# Paso 3.5: Amazon RDS PostgreSQL 🗄️
+# Paso 3.5: Amazon RDS PostgreSQL
 
 Este paso crea una base de datos PostgreSQL en Amazon RDS para la aplicación.
 
-## 📦 Recursos que se crean
+##  Recursos que se crean
 
 - **RDS PostgreSQL Instance** (db.t3.micro)
   - Engine: PostgreSQL 15.4
@@ -15,13 +15,13 @@ Este paso crea una base de datos PostgreSQL en Amazon RDS para la aplicación.
 - **DB Subnet Group** (usa las subnets públicas)
 - **IAM Role** (para Enhanced Monitoring)
 
-## ⚠️ Prerequisitos
+##  Prerequisitos
 
 Debes tener completado:
-1. ✅ Paso 2: VPC y Networking
-2. ✅ Paso 3: ALB y Target Groups
+1. Paso 2: VPC y Networking
+2. Paso 3: ALB y Target Groups
 
-## 🚀 Despliegue
+##  Despliegue
 
 ### 1. Inicializar Terraform
 
@@ -42,7 +42,7 @@ terraform plan
 terraform apply
 ```
 
-**⏱️ Tiempo estimado**: 5-10 minutos
+****Tiempo estimado**: 5-10 minutos
 
 ### 4. Obtener información de conexión
 
@@ -57,9 +57,9 @@ terraform output connection_info
 terraform output rds_summary
 ```
 
-## 🔐 Credenciales por defecto
+##  Credenciales por defecto
 
-⚠️ **Cambiar en producción:**
+****Cambiar en producción:**
 - **Usuario**: `postgres`
 - **Contraseña**: `postgres123`
 - **Base de datos**: `miso_devops_blacklists`
@@ -113,15 +113,15 @@ psql -h <db_host> -U postgres -d miso_devops_blacklists
 terraform destroy
 ```
 
-⚠️ **Nota**: Por defecto se omite el snapshot final (`skip_final_snapshot = true`). Cambiar a `false` en producción para conservar backups.
+****Nota**: Por defecto se omite el snapshot final (`skip_final_snapshot = true`). Cambiar a `false` en producción para conservar backups.
 
-## 📊 Monitoreo
+##  Monitoreo
 
 La instancia incluye:
-- ✅ **Enhanced Monitoring** (60 segundos)
-- ✅ **Performance Insights** (7 días de retención)
-- ✅ **CloudWatch Logs** (postgresql, upgrade)
-- ✅ **Automated Backups** (7 días de retención)
+- **Enhanced Monitoring** (60 segundos)
+- **Performance Insights** (7 días de retención)
+- **CloudWatch Logs** (postgresql, upgrade)
+- **Automated Backups** (7 días de retención)
 
 ## 🔗 Conexión desde ECS
 
@@ -137,13 +137,13 @@ environment = [
 ]
 ```
 
-## 🔒 Seguridad
+## Seguridad
 
-- ✅ Storage cifrado (encryption-at-rest)
-- ✅ No públicamente accesible
-- ✅ Security Group restrictivo (solo desde ECS)
-- ✅ Backups automáticos habilitados
-- ⚠️ Credenciales en texto plano (usar Secrets Manager en producción)
+- Storage cifrado (encryption-at-rest)
+- No públicamente accesible
+- Security Group restrictivo (solo desde ECS)
+- Backups automáticos habilitados
+- Credenciales en texto plano (usar Secrets Manager en producción)
 
 ## 📝 Mejoras para Producción
 

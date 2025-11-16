@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# ============================================
 # Script de Despliegue Completo
 # Tutorial 5 - AWS CodeDeploy con Fargate
-# ============================================
 
 set -e  # Detener en caso de error
 
@@ -19,9 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${SCRIPT_DIR}/deployment.log"
 START_TIME=$(date +%s)
 
-# ============================================
 # Funciones auxiliares
-# ============================================
 
 log() {
     echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1" | tee -a "$LOG_FILE"
@@ -49,14 +45,14 @@ check_prerequisites() {
         log_error "Terraform no está instalado"
         exit 1
     fi
-    log "✓ Terraform instalado: $(terraform version | head -n1)"
+    log "[OK] Terraform instalado: $(terraform version | head -n1)"
     
     # Verificar AWS CLI
     if ! command -v aws &> /dev/null; then
         log_error "AWS CLI no está instalado"
         exit 1
     fi
-    log "✓ AWS CLI instalado: $(aws --version)"
+    log "[OK] AWS CLI instalado: $(aws --version)"
     
     # Verificar credenciales AWS
     if ! aws sts get-caller-identity &> /dev/null; then
@@ -65,15 +61,15 @@ check_prerequisites() {
     fi
     ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
     REGION=$(aws configure get region || echo "us-east-1")
-    log "✓ AWS Account ID: $ACCOUNT_ID"
-    log "✓ AWS Region: $REGION"
+    log "[OK] AWS Account ID: $ACCOUNT_ID"
+    log "[OK] AWS Region: $REGION"
     
     # Verificar Docker
     if ! command -v docker &> /dev/null; then
         log_error "Docker no está instalado"
         exit 1
     fi
-    log "✓ Docker instalado: $(docker --version)"
+    log "[OK] Docker instalado: $(docker --version)"
 }
 
 terraform_deploy() {
@@ -98,7 +94,7 @@ terraform_deploy() {
     
     rm -f tfplan
     
-    log "${GREEN}✓ $step_name completado${NC}"
+    log "${GREEN}[OK] $step_name completado${NC}"
 }
 
 get_terraform_output() {
@@ -109,9 +105,7 @@ get_terraform_output() {
     terraform output -raw "$output_name" 2>/dev/null || echo ""
 }
 
-# ============================================
 # Main Deployment Flow
-# ============================================
 
 reset_terraform_vars() {
     log "Reseteando terraform.tfvars a valores placeholder..."
@@ -126,11 +120,11 @@ reset_terraform_vars() {
     sed -i.bak "s/subnet_ids *= *\[.*\]/subnet_ids = [\"subnet-PLACEHOLDER1\", \"subnet-PLACEHOLDER2\"]/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
     sed -i.bak "s/db_host *= *\".*\"/db_host = \"db-PLACEHOLDER.rds.amazonaws.com\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
     
-    log "✓ Variables reseteadas"
+    log "[OK] Variables reseteadas"
 }
 
 main() {
-    log_step "🚀 Iniciando Despliegue Completo"
+    log_step "[START] Iniciando Despliegue Completo"
     log "Log file: $LOG_FILE"
     
     # Resetear variables a placeholders
@@ -156,7 +150,7 @@ main() {
         log "Ejecutando build y push de imagen Docker..."
         cd "${SCRIPT_DIR}/p2-ecr"
         bash rebuild-and-push.sh | tee -a "$LOG_FILE"
-        log "${GREEN}✓ Docker image creada y subida a ECR${NC}"
+        log "${GREEN}[OK] Docker image creada y subida a ECR${NC}"
     else
         log_warning "Script rebuild-and-push.sh no encontrado, saltando..."
     fi
@@ -179,7 +173,7 @@ main() {
         log "Actualizando terraform.tfvars en p3-rds-postgres con VPC y SG..."
         sed -i.bak "s/vpc_id = \".*\"/vpc_id = \"$VPC_ID\"/" "${SCRIPT_DIR}/p3-rds-postgres/terraform.tfvars"
         sed -i.bak "s/ecs_tasks_security_group_id = \".*\"/ecs_tasks_security_group_id = \"$ECS_SG_ID\"/" "${SCRIPT_DIR}/p3-rds-postgres/terraform.tfvars"
-        log "✓ Variables de red actualizadas en RDS terraform.tfvars"
+        log "[OK] Variables de red actualizadas en RDS terraform.tfvars"
     fi
     
     # Paso 3.5: RDS PostgreSQL
@@ -193,20 +187,20 @@ main() {
     if [ -n "$DB_HOST" ]; then
         log "Actualizando terraform.tfvars en p4-ecs-cluster-task..."
         sed -i.bak "s/db_host = \".*\"/db_host = \"$DB_HOST\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-        log "✓ DB_HOST actualizado en terraform.tfvars"
+        log "[OK] DB_HOST actualizado en terraform.tfvars"
     fi
     
     if [ -n "$VPC_ID" ] && [ -n "$ECS_SG_ID" ]; then
         sed -i.bak "s/vpc_id = \".*\"/vpc_id = \"$VPC_ID\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
         sed -i.bak "s/ecs_tasks_security_group_id = \".*\"/ecs_tasks_security_group_id = \"$ECS_SG_ID\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-        log "✓ Variables de red actualizadas en ECS terraform.tfvars"
+        log "[OK] Variables de red actualizadas en ECS terraform.tfvars"
     fi
     
     if [ -n "$SUBNET_IDS" ]; then
         # Convertir "subnet-xxx,subnet-yyy" a ["subnet-xxx", "subnet-yyy"]
         SUBNET_ARRAY=$(echo "$SUBNET_IDS" | awk '{split($0,a,","); printf "["; for(i in a) printf "\"%s\"%s", a[i], (i<length(a)?", ":""); print "]"}')
         sed -i.bak "s/subnet_ids *= *\[.*\]/subnet_ids = $SUBNET_ARRAY/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-        log "✓ Subnet IDs actualizados en ECS terraform.tfvars"
+        log "[OK] Subnet IDs actualizados en ECS terraform.tfvars"
     fi
     
     # Paso 4: ECS Cluster, Task Definition y Service
@@ -229,7 +223,7 @@ main() {
         --output text 2>/dev/null || echo "NONE")
     
     if [ "$CONNECTION_STATUS" = "AVAILABLE" ]; then
-        log "✓ CodeStar Connection encontrada y disponible"
+        log "[OK] CodeStar Connection encontrada y disponible"
         terraform_deploy "${SCRIPT_DIR}/p5-codepipeline" "Paso 5: CodePipeline"
         
         PIPELINE_NAME=$(get_terraform_output "${SCRIPT_DIR}/p5-codepipeline" "pipeline_name")
@@ -250,31 +244,31 @@ main() {
     MINUTES=$((DURATION / 60))
     SECONDS=$((DURATION % 60))
     
-    log_step "✅ Despliegue Completado Exitosamente"
+    log_step "[DONE] Despliegue Completado Exitosamente"
     
-    echo -e "\n${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║          DESPLIEGUE COMPLETADO EXITOSAMENTE                ║${NC}"
-    echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}\n"
+    echo -e "\n${GREEN}=====================================================================${NC}"
+    echo -e "${GREEN}           DESPLIEGUE COMPLETADO EXITOSAMENTE                     ${NC}"
+    echo -e "${GREEN}=====================================================================${NC}\n"
     
-    echo -e "\n${BLUE}📊 Resumen de Recursos Creados:${NC}\n"
-    echo -e "  🔐 IAM Roles:          Creados para CodeDeploy"
-    echo -e "  📦 ECR Repository:     $ECR_URL"
-    echo -e "  🐳 Docker Image:       Subida a ECR con linux/amd64"
-    echo -e "  🌐 VPC:                $VPC_ID"
-    echo -e "  🔒 Security Groups:    $ECS_SG_ID"
-    echo -e "  📡 Subnets:            $(echo $SUBNET_IDS | tr ',' ' ')"
-    echo -e "  ⚖️  Load Balancer:      $ALB_DNS"
-    echo -e "  🗄️  Database:           $DB_HOST (auto-inicializada)"
-    echo -e "  🐳 ECS Cluster:        $CLUSTER_NAME"
-    echo -e "  🚀 ECS Service:        $SERVICE_NAME"
+    echo -e "\n${BLUE}Resumen de Recursos Creados:${NC}\n"
+    echo -e "  - IAM Roles:          Creados para CodeDeploy"
+    echo -e "  - ECR Repository:     $ECR_URL"
+    echo -e "  - Docker Image:       Subida a ECR con linux/amd64"
+    echo -e "  - VPC:                $VPC_ID"
+    echo -e "  - Security Groups:    $ECS_SG_ID"
+    echo -e "  - Subnets:            $(echo $SUBNET_IDS | tr ',' ' ')"
+    echo -e "  - Load Balancer:      $ALB_DNS"
+    echo -e "  - Database:           $DB_HOST (auto-inicializada)"
+    echo -e "  - ECS Cluster:        $CLUSTER_NAME"
+    echo -e "  - ECS Service:        $SERVICE_NAME"
     
     if [ -n "${PIPELINE_NAME:-}" ]; then
-        echo -e "  🔄 CodePipeline:       $PIPELINE_NAME (CI/CD Activo)"
+        echo -e "  - CodePipeline:       $PIPELINE_NAME (CI/CD Activo)"
     else
-        echo -e "  ⚠️  CodePipeline:       No configurado"
+        echo -e "  - CodePipeline:       No configurado"
     fi
     
-    echo -e "\n${BLUE}🔗 URLs de Acceso:${NC}\n"
+    echo -e "\n${BLUE}URLs de Acceso:${NC}\n"
     echo -e "  Application (Blue):  http://$ALB_DNS"
     echo -e "  Application (Green): http://$ALB_DNS:8080"
     
@@ -282,9 +276,9 @@ main() {
         echo -e "  CodePipeline Console: $PIPELINE_URL"
     fi
     
-    echo -e "\n${BLUE}⏱️  Tiempo de Despliegue:${NC} ${MINUTES}m ${SECONDS}s\n"
+    echo -e "\n${BLUE}Tiempo de Despliegue:${NC} ${MINUTES}m ${SECONDS}s\n"
     
-    echo -e "\n${YELLOW}📝 Próximos Pasos:${NC}\n"
+    echo -e "\n${YELLOW}Próximos Pasos:${NC}\n"
     echo -e "  1. Verificar que el servicio ECS esté corriendo:"
     echo -e "     ${GREEN}aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME${NC}"
     echo -e ""
@@ -308,7 +302,7 @@ main() {
         echo -e ""
     fi
     
-    echo -e "${BLUE}💡 Nota:${NC} La aplicación crea automáticamente:"
+    echo -e "${BLUE}Nota:${NC} La aplicación crea automáticamente:"
     echo -e "   - Base de datos 'miso_devops_blacklists' si no existe"
     echo -e "   - Tablas necesarias (blacklists, etc.)"
     echo -e ""
@@ -317,9 +311,7 @@ main() {
     log "Log guardado en: $LOG_FILE"
 }
 
-# ============================================
 # Manejo de señales
-# ============================================
 
 cleanup() {
     log_error "Script interrumpido por el usuario"
@@ -328,8 +320,6 @@ cleanup() {
 
 trap cleanup SIGINT SIGTERM
 
-# ============================================
 # Ejecutar main
-# ============================================
 
 main "$@"

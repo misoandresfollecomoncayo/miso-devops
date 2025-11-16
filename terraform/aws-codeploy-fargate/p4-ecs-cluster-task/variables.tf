@@ -1,6 +1,4 @@
-# ============================================
 # Variables de entrada para el Paso 4 - ECS
-# ============================================
 
 variable "aws_region" {
   description = "Región de AWS"
@@ -20,18 +18,14 @@ variable "environment" {
   default     = "dev"
 }
 
-# ============================================
 # Variables de ECS Cluster
-# ============================================
 variable "log_retention_days" {
   description = "Días de retención de logs en CloudWatch"
   type        = number
   default     = 7
 }
 
-# ============================================
 # Variables de Task Definition
-# ============================================
 variable "task_cpu" {
   description = "CPU para la task (256, 512, 1024, 2048, 4096)"
   type        = string
@@ -67,9 +61,7 @@ variable "image_tag" {
   default     = "latest"
 }
 
-# ============================================
 # Variables de Base de Datos
-# ============================================
 variable "db_user" {
   description = "Usuario de la base de datos"
   type        = string
@@ -99,9 +91,7 @@ variable "db_port" {
   default     = 5432
 }
 
-# ============================================
 # Variables de Networking (desde Paso 3)
-# ============================================
 variable "vpc_id" {
   description = "ID de la VPC"
   type        = string
@@ -117,9 +107,7 @@ variable "ecs_tasks_security_group_id" {
   type        = string
 }
 
-# ============================================
 # Variables de ECS Service
-# ============================================
 variable "desired_count" {
   description = "Número de tareas deseadas en el servicio"
   type        = number

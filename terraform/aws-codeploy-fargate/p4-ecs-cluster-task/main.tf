@@ -1,16 +1,6 @@
-# ============================================
-# PASO 4: ECS Cluster y Task Definition
-# ============================================
-# Este archivo contiene:
-# 1. Configuración de Terraform y Provider AWS
-# 2. Cluster ECS
-# 3. CloudWatch Log Group
-# 4. IAM Role para ECS Task Execution
-# 5. Task Definition
+# ECS Cluster, Task Definition y Service
+# Configuración de contenedores y servicios para despliegue en Fargate
 
-# ============================================
-# 1. Configuración de Terraform
-# ============================================
 terraform {
   required_version = ">= 1.0"
   
@@ -22,9 +12,6 @@ terraform {
   }
 }
 
-# ============================================
-# 2. Configuración del Provider AWS
-# ============================================
 provider "aws" {
   region = var.aws_region
   
@@ -38,15 +25,10 @@ provider "aws" {
   }
 }
 
-# ============================================
-# 3. Data Sources
-# ============================================
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-# ============================================
 # 4. ECS Cluster
-# ============================================
 resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-${var.environment}-cluster"
 
@@ -60,9 +42,7 @@ resource "aws_ecs_cluster" "main" {
   }
 }
 
-# ============================================
 # 5. CloudWatch Log Group
-# ============================================
 resource "aws_cloudwatch_log_group" "app" {
   name              = "/ecs/${var.project_name}-${var.environment}"
   retention_in_days = var.log_retention_days
@@ -72,9 +52,7 @@ resource "aws_cloudwatch_log_group" "app" {
   }
 }
 
-# ============================================
 # 6. IAM Role para ECS Task Execution
-# ============================================
 # Este rol permite a ECS descargar imágenes de ECR y escribir logs
 resource "aws_iam_role" "ecs_task_execution" {
   name = "${var.project_name}-${var.environment}-ecs-task-execution-role"
@@ -103,9 +81,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# ============================================
 # 7. IAM Role para ECS Task (Runtime)
-# ============================================
 # Este rol es el que usa la aplicación en runtime
 resource "aws_iam_role" "ecs_task" {
   name = "${var.project_name}-${var.environment}-ecs-task-role"
@@ -148,9 +124,7 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
   })
 }
 
-# ============================================
 # 8. Task Definition
-# ============================================
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.project_name}-${var.environment}"
   network_mode             = "awsvpc"
@@ -220,17 +194,13 @@ resource "aws_ecs_task_definition" "app" {
   }
 }
 
-# ============================================
 # 9. Data Sources - Target Groups
-# ============================================
 # Data sources para Target Groups
 data "aws_lb_target_group" "blue" {
   name = "${var.project_name}-${var.environment}-blue-tg"
 }
 
-# ============================================
 # 10. Servicio ECS
-# ============================================
 resource "aws_ecs_service" "app" {
   name            = "${var.project_name}-${var.environment}-service"
   cluster         = aws_ecs_cluster.main.id
