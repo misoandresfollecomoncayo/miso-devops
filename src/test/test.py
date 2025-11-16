@@ -8,10 +8,17 @@ from app import create_app
 
 @pytest.fixture
 def client():
+    """Crea un cliente de prueba con base de datos en memoria (SQLite)"""
     app = create_app(testing=True)
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
+
+def test_ping(client):
+    """Test del endpoint /ping sin conexión a BD"""
+    response = client.get('/ping')
+    assert response.status_code == 200
+    assert response.data == b'Ok'
 
 def test_blacklists_success_with_mock(client):
     with patch('routes.db.session.add') as mock_add, \
