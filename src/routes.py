@@ -21,7 +21,7 @@ def is_email(value: str) -> bool:
 # Agregar health check
 @blacklists_bp.route('/ping', methods=['GET'])
 def health_check():
-    return "Ok Nuevo", 200
+    return "Ok Nuevo 2", 200
 
 # Permite agregar un email a la lista negra global de la organización
 @blacklists_bp.route('/blacklists', methods=['POST'])

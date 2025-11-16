@@ -109,3 +109,24 @@ output "console_url" {
   description = "URL para ver el cluster en AWS Console"
   value       = "https://console.aws.amazon.com/ecs/home?region=${data.aws_region.current.name}#/clusters/${aws_ecs_cluster.main.name}"
 }
+
+# Outputs: CodeDeploy
+output "codedeploy_app_name" {
+  description = "Nombre de la aplicación CodeDeploy"
+  value       = aws_codedeploy_app.app.name
+}
+
+output "codedeploy_deployment_group_name" {
+  description = "Nombre del deployment group de CodeDeploy"
+  value       = aws_codedeploy_deployment_group.app.deployment_group_name
+}
+
+output "codedeploy_deployment_config" {
+  description = "Configuración de despliegue utilizada"
+  value       = var.deployment_config_name
+}
+
+output "codedeploy_console_url" {
+  description = "URL para ver CodeDeploy en AWS Console"
+  value       = "https://console.aws.amazon.com/codesuite/codedeploy/applications/${aws_codedeploy_app.app.name}?region=${data.aws_region.current.name}"
+}

@@ -113,3 +113,16 @@ variable "desired_count" {
   type        = number
   default     = 1
 }
+
+# Variables de CodeDeploy
+variable "deployment_config_name" {
+  description = "Configuración de despliegue de CodeDeploy"
+  type        = string
+  default     = "CodeDeployDefault.ECSLinear10PercentEvery1Minutes"
+  # Opciones disponibles:
+  # - CodeDeployDefault.ECSAllAtOnce (0 -> 100% inmediato)
+  # - CodeDeployDefault.ECSLinear10PercentEvery1Minutes (10% cada minuto)
+  # - CodeDeployDefault.ECSLinear10PercentEvery3Minutes (10% cada 3 minutos)
+  # - CodeDeployDefault.ECSCanary10Percent5Minutes (10%, espera 5 min, luego 90%)
+  # - CodeDeployDefault.ECSCanary10Percent15Minutes (10%, espera 15 min, luego 90%)
+}

@@ -242,3 +242,93 @@ resource "aws_ecs_service" "app" {
     aws_iam_role_policy_attachment.ecs_task_execution_policy
   ]
 }
+
+# 11. CodeDeploy Application
+resource "aws_codedeploy_app" "app" {
+  name             = "${var.project_name}-${var.environment}-app"
+  compute_platform = "ECS"
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-codedeploy-app"
+  }
+}
+
+# Data sources para CodeDeploy
+data "aws_iam_role" "codedeploy" {
+  name = "${var.project_name}-${var.environment}-codedeploy-role"
+}
+
+data "aws_lb_target_group" "green" {
+  name = "${var.project_name}-${var.environment}-green-tg"
+}
+
+data "aws_lb" "main" {
+  name = "${var.project_name}-${var.environment}-alb"
+}
+
+data "aws_lb_listener" "production" {
+  load_balancer_arn = data.aws_lb.main.arn
+  port              = 80
+}
+
+data "aws_lb_listener" "test" {
+  load_balancer_arn = data.aws_lb.main.arn
+  port              = 8080
+}
+
+# 12. CodeDeploy Deployment Group
+resource "aws_codedeploy_deployment_group" "app" {
+  app_name               = aws_codedeploy_app.app.name
+  deployment_group_name  = "${var.project_name}-${var.environment}-dg"
+  service_role_arn       = data.aws_iam_role.codedeploy.arn
+  deployment_config_name = var.deployment_config_name
+
+  ecs_service {
+    cluster_name = aws_ecs_cluster.main.name
+    service_name = aws_ecs_service.app.name
+  }
+
+  deployment_style {
+    deployment_option = "WITH_TRAFFIC_CONTROL"
+    deployment_type   = "BLUE_GREEN"
+  }
+
+  blue_green_deployment_config {
+    terminate_blue_instances_on_deployment_success {
+      action                           = "TERMINATE"
+      termination_wait_time_in_minutes = 5
+    }
+
+    deployment_ready_option {
+      action_on_timeout = "CONTINUE_DEPLOYMENT"
+    }
+  }
+
+  load_balancer_info {
+    target_group_pair_info {
+      prod_traffic_route {
+        listener_arns = [data.aws_lb_listener.production.arn]
+      }
+
+      test_traffic_route {
+        listener_arns = [data.aws_lb_listener.test.arn]
+      }
+
+      target_group {
+        name = data.aws_lb_target_group.blue.name
+      }
+
+      target_group {
+        name = data.aws_lb_target_group.green.name
+      }
+    }
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-deployment-group"
+  }
+
+  depends_on = [
+    aws_ecs_service.app
+  ]
+}
