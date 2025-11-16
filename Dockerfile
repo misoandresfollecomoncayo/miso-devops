@@ -1,5 +1,6 @@
 # Build Base
-FROM public.ecr.aws/docker/library/python:3.12-slim AS base
+# IMPORTANTE: Forzar arquitectura AMD64 para ECS Fargate
+FROM --platform=linux/amd64 public.ecr.aws/docker/library/python:3.12-slim AS base
 #FROM python:3.12-slim AS base
 
 ENV PYTHONPATH=/app/src
@@ -29,7 +30,7 @@ ENV DB_NAME=dbdevops
 ENV DB_HOST=db-postgres-devops.c6n2e2wes55q.us-east-1.rds.amazonaws.com
 ENV DB_PORT=5432
 
-EXPOSE 8000
+EXPOSE 5000
 
 #Arranque
-CMD ["python","-m","src.main" ]
+CMD ["python","-m","src.app"]

@@ -1,0 +1,151 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    FLUJO AUTOMÁTICO DESTROY → DEPLOY                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 1. ESTADO ACTUAL (después de un deploy exitoso)                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    terraform.tfvars contiene IDs REALES:
+    ┌─────────────────────────────────────────────────────────┐
+    │ vpc_id = "vpc-053c100aa14fed416"                        │
+    │ ecs_tasks_security_group_id = "sg-03bb290e3631c753e"    │
+    │ subnet_ids = ["subnet-03dd...", "subnet-04026..."]      │
+    │ db_host = "python-app-dev-db.cw54gouccfhu...com"        │
+    └─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 2. EJECUTAR: ./destroy-all.sh                                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Orden de destrucción:
+    ┌─────────────────────────────────────────────────────────┐
+    │ 1. Forzar eliminación de ECS Service (con tareas)       │
+    │ 2. terraform destroy p4-ecs-cluster-task                │
+    │ 3. terraform destroy p3-rds-postgres                    │
+    │ 4. terraform destroy p3-alb-target-groups               │
+    │ 5. Eliminar imágenes de ECR                             │
+    │ 6. terraform destroy p2-ecr                             │
+    │ 7. terraform destroy p1-iam-roles                       │
+    │ 8. ✨ RESETEAR terraform.tfvars → PLACEHOLDER           │
+    └─────────────────────────────────────────────────────────┘
+
+    DESPUÉS DEL DESTROY:
+    ┌─────────────────────────────────────────────────────────┐
+    │ vpc_id = "vpc-PLACEHOLDER"                              │
+    │ ecs_tasks_security_group_id = "sg-PLACEHOLDER"          │
+    │ subnet_ids = ["subnet-PLACEHOLDER1", "...2"]            │
+    │ db_host = "db-PLACEHOLDER.rds.amazonaws.com"            │
+    └─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 3. ESPERAR 30 segundos (AWS cleanup)                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 4. EJECUTAR: ./deploy-all.sh                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Paso 0: Reset de variables
+    ┌─────────────────────────────────────────────────────────┐
+    │ ✨ reset_terraform_vars()                                │
+    │    → Asegura que no hay IDs viejos                      │
+    │    → Resetea a PLACEHOLDER                              │
+    └─────────────────────────────────────────────────────────┘
+
+    Paso 1: IAM Roles
+    ┌─────────────────────────────────────────────────────────┐
+    │ terraform apply p1-iam-roles                            │
+    └─────────────────────────────────────────────────────────┘
+
+    Paso 2: ECR + Docker Build
+    ┌─────────────────────────────────────────────────────────┐
+    │ terraform apply p2-ecr                                  │
+    │ docker build --platform linux/amd64                     │
+    │ docker push → ECR                                       │
+    │                                                         │
+    │ OUTPUT: ECR_URL = "148342...amazonaws.com/python-app"   │
+    └─────────────────────────────────────────────────────────┘
+
+    Paso 3: VPC + ALB + Target Groups
+    ┌─────────────────────────────────────────────────────────┐
+    │ terraform apply p3-alb-target-groups                    │
+    │                                                         │
+    │ OUTPUTS capturados:                                     │
+    │   VPC_ID = "vpc-NEW123..."                              │
+    │   ECS_SG_ID = "sg-NEW456..."                            │
+    │   SUBNET_IDS = "subnet-NEW1,subnet-NEW2"                │
+    │   ALB_DNS = "python-app-dev-alb-XXXX.elb..."            │
+    │                                                         │
+    │ ✨ ACTUALIZA terraform.tfvars:                          │
+    │   p3-rds-postgres/terraform.tfvars:                     │
+    │     vpc_id = "vpc-NEW123..."                            │
+    │     ecs_tasks_security_group_id = "sg-NEW456..."        │
+    └─────────────────────────────────────────────────────────┘
+
+    Paso 3.5: RDS PostgreSQL
+    ┌─────────────────────────────────────────────────────────┐
+    │ terraform apply p3-rds-postgres                         │
+    │   (usa vpc_id y ecs_tasks_security_group_id NUEVOS)    │
+    │                                                         │
+    │ OUTPUT capturado:                                       │
+    │   DB_HOST = "python-app-dev-db.NEWABC...com"            │
+    │                                                         │
+    │ ✨ ACTUALIZA terraform.tfvars:                          │
+    │   p4-ecs-cluster-task/terraform.tfvars:                 │
+    │     vpc_id = "vpc-NEW123..."                            │
+    │     subnet_ids = ["subnet-NEW1", "subnet-NEW2"]         │
+    │     ecs_tasks_security_group_id = "sg-NEW456..."        │
+    │     db_host = "python-app-dev-db.NEWABC...com"          │
+    └─────────────────────────────────────────────────────────┘
+
+    Paso 4: ECS Cluster + Service
+    ┌─────────────────────────────────────────────────────────┐
+    │ terraform apply p4-ecs-cluster-task                     │
+    │   (usa todos los valores NUEVOS actualizados)           │
+    │                                                         │
+    │ OUTPUTS:                                                │
+    │   CLUSTER_NAME = "python-app-dev-cluster"               │
+    │   SERVICE_NAME = "python-app-dev-service"               │
+    └─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 5. RESULTADO FINAL                                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ✅ Todos los recursos creados con IDs NUEVOS
+    ✅ terraform.tfvars actualizados automáticamente
+    ✅ Aplicación funcionando en http://$ALB_DNS/ping
+    ✅ Health checks pasando (200 OK)
+    ✅ Base de datos auto-inicializada
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                           VENTAJAS DEL FLUJO                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ✨ Totalmente automático - no requiere edición manual
+  ✨ Idempotente - puedes ejecutar múltiples veces
+  ✨ Seguro - resetea valores para evitar IDs obsoletos
+  ✨ Documentado - logs en deployment.log y destruction.log
+  ✨ Validado - cada paso verifica prerequisitos
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              COMANDOS ÚTILES                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  # Ciclo completo
+  ./destroy-all.sh && sleep 30 && ./deploy-all.sh
+
+  # Prueba automática
+  ./test-cycle.sh
+
+  # Verificar estado actual
+  ALB_DNS=$(cd p3-alb-target-groups && terraform output -raw alb_dns_name)
+  curl "http://$ALB_DNS/ping"
+
+  # Ver logs de aplicación
+  aws logs tail /ecs/python-app-dev --follow
+
+  # Ver logs de scripts
+  tail -f deployment.log
+  tail -f destruction.log

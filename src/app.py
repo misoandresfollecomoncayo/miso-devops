@@ -31,6 +31,8 @@ def create_app(testing=False):
 
     return app
 
+# Configuración para ejecución directa y como módulo
+app = create_app(testing=False)
+
 if __name__ == '__main__':
-    app = create_app(testing=False)
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

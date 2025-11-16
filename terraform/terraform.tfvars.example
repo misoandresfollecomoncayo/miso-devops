@@ -1,0 +1,33 @@
+# terraform.tfvars.example
+# Copiar este archivo a terraform.tfvars y ajustar los valores
+
+# Configuración de AWS
+aws_region  = "us-east-1"
+environment = "dev"
+
+# Configuración del Proyecto
+project_name = "python-app"
+
+# Configuración de VPC
+vpc_cidr = "10.0.0.0/16"
+
+# Configuración de ECR
+ecr_repository_name = "python-app"
+
+# Configuración del Contenedor
+container_port   = 5000
+container_cpu    = 256
+container_memory = 512
+desired_count    = 2
+
+# Configuración de GitHub
+# IMPORTANTE: Genera un token personal en GitHub con permisos repo y admin:repo_hook
+github_oauth_token      = "ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+github_repository_owner = "tu-usuario-github"
+github_repository_name  = "taller_codedeploy_fargate"
+github_repository_url   = "https://github.com/tu-usuario/taller_codedeploy_fargate"
+github_branch           = "main"
+
+# Configuración de CodeDeploy
+deployment_config_name  = "CodeDeployDefault.ECSAllAtOnce"
+termination_wait_time   = 5
