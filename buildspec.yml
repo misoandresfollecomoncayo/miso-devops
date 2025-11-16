@@ -9,9 +9,8 @@ phases:
   pre_build:
     commands:
       - echo Running unit tests...
-      # Skip tests that require database connection in CodeBuild
-      # Tests will run in ECS environment where DB is available
-      - echo "Skipping DB-dependent tests in build phase"
+      - python -m pytest src/test/ -v --tb=short || exit 1
+      - echo All tests passed successfully
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
