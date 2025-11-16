@@ -1,9 +1,9 @@
 version: 0.2
 
-
 phases:
   install:
     commands:
+      - echo Installing dependencies...
       - pip install -r requirements.txt
 
   pre_build:
@@ -13,41 +13,36 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
-      - echo $ECR_REPO_URI
-      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION)
-      - export IMAGE_TAG
+      - REPOSITORY_URI=$ECR_REPO_URI
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo "Image tag:" $IMAGE_TAG
 
   build:
     commands:
+      - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $ECR_REPO_URI:$IMAGE_TAG .
-      - docker tag $ECR_REPO_URI:$IMAGE_TAG $ECR_REPO_URI:$IMAGE_TAG
-      - |
-        cat > Dockerrun.aws.json <<EOF
-        {
-          "AWSEBDockerrunVersion": "1",
-          "Image": {
-            "Name": "$ECR_REPO_URI:$IMAGE_TAG",
-            "Update": "true"
-          },
-          "Ports": [
-            { "ContainerPort": "8000" }
-          ],
-          "Environment": [
-            { "Name": "DB_USER", "Value": "$DB_USER" },
-            { "Name": "DB_PASSWORD", "Value": "$DB_PASSWORD" },
-            { "Name": "DB_NAME", "Value": "$DB_NAME" },
-            { "Name": "DB_HOST", "Value": "$DB_HOST" }
-          ]
-        }
-        EOF
-      - zip -r "Dockerrun_${IMAGE_TAG}.zip" Dockerrun.aws.json
+      - docker build --platform linux/amd64 -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
-      - echo Pushing the Docker image to ECR...
-      - docker push $ECR_REPO_URI:$IMAGE_TAG
       - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"python-app","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo "Updating taskdef.json with new image..."
+      - sed -i "s|<IMAGE1_NAME>|$REPOSITORY_URI:$IMAGE_TAG|g" taskdef.json
+      - cat taskdef.json
+      - cat imagedefinitions.json
+
+artifacts:
+  files:
+    - appspec.json
+    - taskdef.json
+    - imagedefinitions.json
 
 artifacts:
   files:
