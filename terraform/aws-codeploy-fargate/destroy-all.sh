@@ -189,7 +189,13 @@ main() {
     
     log "Iniciando destrucción de recursos..."
     
-    # Paso 4: ECS Cluster, Task Definition y Service (destruir primero)
+    # Paso 5: CodePipeline (destruir primero)
+    if [ -d "${SCRIPT_DIR}/p5-codepipeline" ]; then
+        log_step "Eliminando CodePipeline y CodeBuild"
+        terraform_destroy "${SCRIPT_DIR}/p5-codepipeline" "Paso 5: CodePipeline" || true
+    fi
+    
+    # Paso 4: ECS Cluster, Task Definition y Service
     if [ -d "${SCRIPT_DIR}/p4-ecs-cluster-task" ]; then
         # Intentar forzar eliminación del servicio primero
         force_delete_ecs_service
@@ -235,6 +241,7 @@ main() {
     echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}\n"
     
     echo -e "${BLUE}📊 Recursos Eliminados:${NC}\n"
+    echo -e "  ✓ CodePipeline y CodeBuild"
     echo -e "  ✓ ECS Cluster y Service"
     echo -e "  ✓ Base de datos RDS PostgreSQL"
     echo -e "  ✓ Application Load Balancer"

@@ -218,6 +218,32 @@ main() {
     log "ECS Cluster: $CLUSTER_NAME"
     log "ECS Service: $SERVICE_NAME"
     
+    # Paso 5: CodePipeline (CI/CD)
+    log_step "Paso 5: CodePipeline - CI/CD Automation"
+    
+    # Verificar si existe CodeStar Connection
+    CONNECTION_STATUS=$(aws codestar-connections list-connections \
+        --provider-type-filter GitHub \
+        --region us-east-1 \
+        --query "Connections[?ConnectionName=='python-app-dev-github'].ConnectionStatus | [0]" \
+        --output text 2>/dev/null || echo "NONE")
+    
+    if [ "$CONNECTION_STATUS" = "AVAILABLE" ]; then
+        log "✓ CodeStar Connection encontrada y disponible"
+        terraform_deploy "${SCRIPT_DIR}/p5-codepipeline" "Paso 5: CodePipeline"
+        
+        PIPELINE_NAME=$(get_terraform_output "${SCRIPT_DIR}/p5-codepipeline" "pipeline_name")
+        PIPELINE_URL=$(get_terraform_output "${SCRIPT_DIR}/p5-codepipeline" "console_url")
+        log "Pipeline: $PIPELINE_NAME"
+        log "Console URL: $PIPELINE_URL"
+    else
+        log_warning "CodeStar Connection no configurada o no disponible"
+        log_warning "Para configurar CI/CD, ejecuta:"
+        log_warning "  cd ${SCRIPT_DIR}/p5-codepipeline"
+        log_warning "  ./setup-codestar-connection.sh"
+        log_warning "  terraform init && terraform apply"
+    fi
+    
     # Resumen final
     END_TIME=$(date +%s)
     DURATION=$((END_TIME - START_TIME))
@@ -242,9 +268,19 @@ main() {
     echo -e "  🐳 ECS Cluster:        $CLUSTER_NAME"
     echo -e "  🚀 ECS Service:        $SERVICE_NAME"
     
+    if [ -n "${PIPELINE_NAME:-}" ]; then
+        echo -e "  🔄 CodePipeline:       $PIPELINE_NAME (CI/CD Activo)"
+    else
+        echo -e "  ⚠️  CodePipeline:       No configurado"
+    fi
+    
     echo -e "\n${BLUE}🔗 URLs de Acceso:${NC}\n"
     echo -e "  Application (Blue):  http://$ALB_DNS"
     echo -e "  Application (Green): http://$ALB_DNS:8080"
+    
+    if [ -n "${PIPELINE_URL:-}" ]; then
+        echo -e "  CodePipeline Console: $PIPELINE_URL"
+    fi
     
     echo -e "\n${BLUE}⏱️  Tiempo de Despliegue:${NC} ${MINUTES}m ${SECONDS}s\n"
     
@@ -260,9 +296,17 @@ main() {
     echo -e "  4. Probar la aplicación:"
     echo -e "     ${GREEN}curl http://$ALB_DNS/blacklists/ping${NC}"
     echo -e ""
-    echo -e "  5. Continuar con el Paso 5: AWS CodeDeploy"
-    echo -e "     ${GREEN}cd ${SCRIPT_DIR}/p5-codedeploy${NC}"
-    echo -e ""
+    
+    if [ -z "${PIPELINE_NAME:-}" ]; then
+        echo -e "  5. Configurar CI/CD Pipeline:"
+        echo -e "     ${GREEN}cd ${SCRIPT_DIR}/p5-codepipeline${NC}"
+        echo -e "     ${GREEN}./setup-codestar-connection.sh${NC}"
+        echo -e "     ${GREEN}terraform init && terraform apply${NC}"
+        echo -e ""
+    else
+        echo -e "  5. Pipeline CI/CD activo - Los commits a 'main' se desplegarán automáticamente"
+        echo -e ""
+    fi
     
     echo -e "${BLUE}💡 Nota:${NC} La aplicación crea automáticamente:"
     echo -e "   - Base de datos 'miso_devops_blacklists' si no existe"
