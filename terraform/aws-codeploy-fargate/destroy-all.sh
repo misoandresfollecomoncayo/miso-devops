@@ -172,6 +172,58 @@ clean_terraform_state() {
     log "[OK] Archivos de estado limpiados"
 }
 
+empty_s3_bucket() {
+    log_step "Vaciando bucket S3 de CodePipeline"
+    
+    # Obtener account ID dinámicamente
+    local account_id=$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo "148342400171")
+    local bucket_name="python-app-dev-pipeline-artifacts-${account_id}"
+    
+    # Verificar si el bucket existe
+    if aws s3api head-bucket --bucket "$bucket_name" --region us-east-1 2>/dev/null; then
+        log "Vaciando bucket $bucket_name..."
+        
+        # Eliminar todas las versiones de objetos (si tiene versionado)
+        local versions=$(aws s3api list-object-versions \
+            --bucket "$bucket_name" \
+            --region us-east-1 \
+            --output json \
+            --query 'Versions[].{Key:Key,VersionId:VersionId}' 2>/dev/null || echo "[]")
+        
+        if [ "$versions" != "[]" ] && [ -n "$versions" ]; then
+            echo "$versions" | jq -r '.[]? | "--key \(.Key) --version-id \(.VersionId)"' | \
+            while read -r args; do
+                if [ -n "$args" ]; then
+                    aws s3api delete-object --bucket "$bucket_name" --region us-east-1 $args >> "$LOG_FILE" 2>&1 || true
+                fi
+            done
+        fi
+        
+        # Eliminar delete markers (si tiene versionado)
+        local markers=$(aws s3api list-object-versions \
+            --bucket "$bucket_name" \
+            --region us-east-1 \
+            --output json \
+            --query 'DeleteMarkers[].{Key:Key,VersionId:VersionId}' 2>/dev/null || echo "[]")
+        
+        if [ "$markers" != "[]" ] && [ -n "$markers" ]; then
+            echo "$markers" | jq -r '.[]? | "--key \(.Key) --version-id \(.VersionId)"' | \
+            while read -r args; do
+                if [ -n "$args" ]; then
+                    aws s3api delete-object --bucket "$bucket_name" --region us-east-1 $args >> "$LOG_FILE" 2>&1 || true
+                fi
+            done
+        fi
+        
+        # Eliminar objetos actuales
+        aws s3 rm "s3://${bucket_name}" --recursive --region us-east-1 >> "$LOG_FILE" 2>&1 || true
+        
+        log "[OK] Bucket S3 vaciado"
+    else
+        log_warning "Bucket S3 no encontrado, saltando..."
+    fi
+}
+
 # Main Destruction Flow
 
 main() {
@@ -185,6 +237,9 @@ main() {
     
     # Paso 5: CodePipeline (destruir primero)
     if [ -d "${SCRIPT_DIR}/p5-codepipeline" ]; then
+        # Vaciar bucket S3 ANTES de destruir CodePipeline
+        empty_s3_bucket
+        
         log_step "Eliminando CodePipeline y CodeBuild"
         terraform_destroy "${SCRIPT_DIR}/p5-codepipeline" "Paso 5: CodePipeline" || true
     fi
