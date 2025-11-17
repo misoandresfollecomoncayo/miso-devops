@@ -181,42 +181,11 @@ empty_s3_bucket() {
     
     # Verificar si el bucket existe
     if aws s3api head-bucket --bucket "$bucket_name" --region us-east-1 2>/dev/null; then
-        log "Vaciando bucket $bucket_name..."
+        log "Bucket encontrado: $bucket_name"
+        log "Eliminando objetos..."
         
-        # Eliminar todas las versiones de objetos (si tiene versionado)
-        local versions=$(aws s3api list-object-versions \
-            --bucket "$bucket_name" \
-            --region us-east-1 \
-            --output json \
-            --query 'Versions[].{Key:Key,VersionId:VersionId}' 2>/dev/null || echo "[]")
-        
-        if [ "$versions" != "[]" ] && [ -n "$versions" ]; then
-            echo "$versions" | jq -r '.[]? | "--key \(.Key) --version-id \(.VersionId)"' | \
-            while read -r args; do
-                if [ -n "$args" ]; then
-                    aws s3api delete-object --bucket "$bucket_name" --region us-east-1 $args >> "$LOG_FILE" 2>&1 || true
-                fi
-            done
-        fi
-        
-        # Eliminar delete markers (si tiene versionado)
-        local markers=$(aws s3api list-object-versions \
-            --bucket "$bucket_name" \
-            --region us-east-1 \
-            --output json \
-            --query 'DeleteMarkers[].{Key:Key,VersionId:VersionId}' 2>/dev/null || echo "[]")
-        
-        if [ "$markers" != "[]" ] && [ -n "$markers" ]; then
-            echo "$markers" | jq -r '.[]? | "--key \(.Key) --version-id \(.VersionId)"' | \
-            while read -r args; do
-                if [ -n "$args" ]; then
-                    aws s3api delete-object --bucket "$bucket_name" --region us-east-1 $args >> "$LOG_FILE" 2>&1 || true
-                fi
-            done
-        fi
-        
-        # Eliminar objetos actuales
-        aws s3 rm "s3://${bucket_name}" --recursive --region us-east-1 >> "$LOG_FILE" 2>&1 || true
+        # Método simple sin loops complejos
+        aws s3 rm "s3://${bucket_name}" --recursive --region us-east-1 2>&1 | head -20 | tee -a "$LOG_FILE" || true
         
         log "[OK] Bucket S3 vaciado"
     else
