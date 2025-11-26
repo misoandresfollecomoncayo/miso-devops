@@ -14,7 +14,7 @@ Curso: DevOps - Agilizando el Despliegue Continuo de Aplicaciones**
 
 # Descripción
 
-Este repositorio contiene el código fuente del aplicativo "Blacklists".
+Este repositorio contiene el código fuente del aplicativo "Blacklists"
 
 # Tecnologías de desarrollo
 
