@@ -1,0 +1,27 @@
+name: New Relic Events
+on:
+  push:
+    branches:
+      - main
+jobs:
+  send_event:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Send custom event to New Relic
+        run: |
+          curl -X POST "https://insights-collector.newrelic.com/v1/accounts/${{ secrets.NEW_RELIC_ACCOUNT_ID }}/events" \
+          -H "Content-Type: application/json" \
+          -H "Api-Key: ${{ secrets.NEW_RELIC_API_KEY }}" \
+          -d "[
+            {
+              \"eventType\": \"GitHubDevelopmentEvent\",
+              \"repository\": \"${{ github.repository }}\",
+              \"branch\": \"${{ github.ref_name }}\",
+              \"commit\": \"${{ github.sha }}\",
+              \"author\": \"${{ github.actor }}\",
+              \"message\": \"Evento enviado desde GitHub Actions\",
+              \"environment\": \"development\"
+            }
+          ]"
