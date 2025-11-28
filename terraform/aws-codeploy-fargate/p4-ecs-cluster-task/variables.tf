@@ -88,6 +88,26 @@ variable "db_port" {
   default     = 5432
 }
 
+# Variables de New Relic
+variable "new_relic_license_key" {
+  description = "License key de New Relic"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "new_relic_app_name" {
+  description = "Nombre de la aplicación en New Relic"
+  type        = string
+  default     = "Python Blacklists App - ECS Fargate"
+}
+
+variable "new_relic_enabled" {
+  description = "Habilitar monitoreo de New Relic"
+  type        = bool
+  default     = true
+}
+
 # Nota: vpc_id, subnet_ids, ecs_tasks_security_group_id se obtienen dinámicamente
 # desde p3-alb-target-groups via terraform_remote_state
 

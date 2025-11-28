@@ -22,6 +22,7 @@ RUN pip install --upgrade pip \
 
 ##Se copia el codigo de la app
 COPY src /app/src
+COPY newrelic.ini /app/newrelic.ini
 
 ##Variables por defecto
 ENV DB_USER=postgres
@@ -32,5 +33,5 @@ ENV DB_PORT=5432
 
 EXPOSE 5000
 
-#Arranque
-CMD ["python","-m","src.app"]
+#Arranque con New Relic
+CMD ["newrelic-admin", "run-program", "python", "-m", "src.app"]

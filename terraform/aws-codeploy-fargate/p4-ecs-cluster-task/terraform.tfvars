@@ -30,5 +30,10 @@ db_password = "postgres123"
 db_name     = "miso_devops_blacklists"
 db_port     = 5432
 
+# New Relic (configurar con tu license key)
+new_relic_license_key = "c5742501abd3df11ae98b4b6ba90ecddFFFFNRAL"
+new_relic_app_name = "Python Blacklists App - ECS Fargate"
+new_relic_enabled = true
+
 # Servicio ECS
 desired_count = 1

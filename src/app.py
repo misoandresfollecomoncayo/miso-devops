@@ -1,3 +1,8 @@
+import newrelic.agent
+
+# Inicializar New Relic antes que nada
+newrelic.agent.initialize()
+
 from flask import Flask
 from database import db
 from os import getenv
