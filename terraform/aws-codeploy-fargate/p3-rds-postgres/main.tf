@@ -28,10 +28,26 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
+# Data Source - Leer outputs del módulo de networking
+data "terraform_remote_state" "networking" {
+  backend = "local"
+  
+  config = {
+    path = "../p3-alb-target-groups/terraform.tfstate"
+  }
+}
+
+# Variables locales derivadas de remote state
+locals {
+  vpc_id                      = data.terraform_remote_state.networking.outputs.vpc_id
+  ecs_tasks_security_group_id = data.terraform_remote_state.networking.outputs.ecs_tasks_security_group_id
+  public_subnet_ids           = data.terraform_remote_state.networking.outputs.public_subnet_ids
+}
+
 data "aws_subnets" "public" {
   filter {
     name   = "vpc-id"
-    values = [var.vpc_id]
+    values = [local.vpc_id]
   }
   
   filter {
@@ -44,14 +60,14 @@ data "aws_subnets" "public" {
 resource "aws_security_group" "rds" {
   name        = "${var.project_name}-${var.environment}-rds-sg"
   description = "Security group para RDS PostgreSQL"
-  vpc_id      = var.vpc_id
+  vpc_id      = local.vpc_id
 
   ingress {
     description     = "PostgreSQL from ECS Tasks"
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [var.ecs_tasks_security_group_id]
+    security_groups = [local.ecs_tasks_security_group_id]
   }
 
   egress {

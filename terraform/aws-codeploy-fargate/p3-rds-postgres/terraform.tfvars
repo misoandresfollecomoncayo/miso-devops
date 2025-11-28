@@ -2,9 +2,8 @@ aws_region   = "us-east-1"
 project_name = "python-app"
 environment  = "dev"
 
-# Network (valores del paso 3)
-vpc_id = "vpc-00b4c218a107af0ff"
-ecs_tasks_security_group_id = "sg-06d1bf2977cb264b3"
+# Network (obtenido automáticamente desde p3-alb-target-groups via terraform_remote_state)
+# vpc_id y ecs_tasks_security_group_id se obtienen dinámicamente
 
 # Database
 postgres_version    = "15.15"

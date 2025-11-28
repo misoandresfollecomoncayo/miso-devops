@@ -58,16 +58,8 @@ variable "db_password" {
 }
 
 # Network & Security
-
-variable "vpc_id" {
-  description = "ID de la VPC donde se creará RDS"
-  type        = string
-}
-
-variable "ecs_tasks_security_group_id" {
-  description = "ID del Security Group de ECS Tasks (para permitir conexiones)"
-  type        = string
-}
+# Nota: vpc_id y ecs_tasks_security_group_id se obtienen dinámicamente
+# desde p3-alb-target-groups via terraform_remote_state
 
 variable "publicly_accessible" {
   description = "Hacer la base de datos accesible públicamente"

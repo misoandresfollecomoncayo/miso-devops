@@ -107,28 +107,9 @@ get_terraform_output() {
 
 # Main Deployment Flow
 
-reset_terraform_vars() {
-    log "Reseteando terraform.tfvars a valores placeholder..."
-    
-    # Reset RDS vars
-    sed -i.bak "s/vpc_id *= *\".*\"/vpc_id = \"vpc-PLACEHOLDER\"/" "${SCRIPT_DIR}/p3-rds-postgres/terraform.tfvars"
-    sed -i.bak "s/ecs_tasks_security_group_id *= *\".*\"/ecs_tasks_security_group_id = \"sg-PLACEHOLDER\"/" "${SCRIPT_DIR}/p3-rds-postgres/terraform.tfvars"
-    
-    # Reset ECS vars
-    sed -i.bak "s/vpc_id *= *\".*\"/vpc_id = \"vpc-PLACEHOLDER\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-    sed -i.bak "s/ecs_tasks_security_group_id *= *\".*\"/ecs_tasks_security_group_id = \"sg-PLACEHOLDER\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-    sed -i.bak "s/subnet_ids *= *\[.*\]/subnet_ids = [\"subnet-PLACEHOLDER1\", \"subnet-PLACEHOLDER2\"]/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-    sed -i.bak "s/db_host *= *\".*\"/db_host = \"db-PLACEHOLDER.rds.amazonaws.com\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-    
-    log "[OK] Variables reseteadas"
-}
-
 main() {
     log_step "[START] Iniciando Despliegue Completo"
     log "Log file: $LOG_FILE"
-    
-    # Resetear variables a placeholders
-    reset_terraform_vars
     
     # Verificar prerequisitos
     check_prerequisites
@@ -158,7 +139,7 @@ main() {
     # Paso 3: ALB y Target Groups (incluye VPC)
     terraform_deploy "${SCRIPT_DIR}/p3-alb-target-groups" "Paso 3: VPC, ALB y Target Groups"
     
-    # Obtener outputs del Paso 3
+    # Obtener outputs del Paso 3 (solo para logging)
     ALB_DNS=$(get_terraform_output "${SCRIPT_DIR}/p3-alb-target-groups" "alb_dns_name")
     VPC_ID=$(get_terraform_output "${SCRIPT_DIR}/p3-alb-target-groups" "vpc_id")
     ECS_SG_ID=$(get_terraform_output "${SCRIPT_DIR}/p3-alb-target-groups" "ecs_tasks_security_group_id")
@@ -168,42 +149,16 @@ main() {
     log "ECS Tasks Security Group ID: $ECS_SG_ID"
     log "Subnet IDs: $SUBNET_IDS"
     
-    # Actualizar terraform.tfvars de RDS con los valores del Paso 3
-    if [ -n "$VPC_ID" ] && [ -n "$ECS_SG_ID" ]; then
-        log "Actualizando terraform.tfvars en p3-rds-postgres con VPC y SG..."
-        sed -i.bak "s/vpc_id = \".*\"/vpc_id = \"$VPC_ID\"/" "${SCRIPT_DIR}/p3-rds-postgres/terraform.tfvars"
-        sed -i.bak "s/ecs_tasks_security_group_id = \".*\"/ecs_tasks_security_group_id = \"$ECS_SG_ID\"/" "${SCRIPT_DIR}/p3-rds-postgres/terraform.tfvars"
-        log "[OK] Variables de red actualizadas en RDS terraform.tfvars"
-    fi
-    
     # Paso 3.5: RDS PostgreSQL
+    # Las variables de red se obtienen automáticamente via terraform_remote_state
     terraform_deploy "${SCRIPT_DIR}/p3-rds-postgres" "Paso 3.5: RDS PostgreSQL"
     
-    # Obtener DB Host
+    # Obtener DB Host (solo para logging)
     DB_HOST=$(get_terraform_output "${SCRIPT_DIR}/p3-rds-postgres" "db_host")
     log "Database Host: $DB_HOST"
     
-    # Actualizar Task Definition con DB_HOST, VPC_ID y ECS_SG_ID
-    if [ -n "$DB_HOST" ]; then
-        log "Actualizando terraform.tfvars en p4-ecs-cluster-task..."
-        sed -i.bak "s/db_host = \".*\"/db_host = \"$DB_HOST\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-        log "[OK] DB_HOST actualizado en terraform.tfvars"
-    fi
-    
-    if [ -n "$VPC_ID" ] && [ -n "$ECS_SG_ID" ]; then
-        sed -i.bak "s/vpc_id = \".*\"/vpc_id = \"$VPC_ID\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-        sed -i.bak "s/ecs_tasks_security_group_id = \".*\"/ecs_tasks_security_group_id = \"$ECS_SG_ID\"/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-        log "[OK] Variables de red actualizadas en ECS terraform.tfvars"
-    fi
-    
-    if [ -n "$SUBNET_IDS" ]; then
-        # Convertir "subnet-xxx,subnet-yyy" a ["subnet-xxx", "subnet-yyy"]
-        SUBNET_ARRAY=$(echo "$SUBNET_IDS" | awk '{split($0,a,","); printf "["; for(i in a) printf "\"%s\"%s", a[i], (i<length(a)?", ":""); print "]"}')
-        sed -i.bak "s/subnet_ids *= *\[.*\]/subnet_ids = $SUBNET_ARRAY/" "${SCRIPT_DIR}/p4-ecs-cluster-task/terraform.tfvars"
-        log "[OK] Subnet IDs actualizados en ECS terraform.tfvars"
-    fi
-    
     # Paso 4: ECS Cluster, Task Definition y Service
+    # Las variables de red y DB se obtienen automáticamente via terraform_remote_state
     terraform_deploy "${SCRIPT_DIR}/p4-ecs-cluster-task" "Paso 4: ECS Cluster y Task Definition"
     
     # Obtener información del cluster

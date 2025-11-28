@@ -28,6 +28,39 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
+# Data Sources - Leer outputs de otros módulos Terraform
+data "terraform_remote_state" "networking" {
+  backend = "local"
+  
+  config = {
+    path = "../p3-alb-target-groups/terraform.tfstate"
+  }
+}
+
+data "terraform_remote_state" "rds" {
+  backend = "local"
+  
+  config = {
+    path = "../p3-rds-postgres/terraform.tfstate"
+  }
+}
+
+# Variables locales derivadas de remote state
+locals {
+  # Networking desde p3-alb-target-groups
+  vpc_id                       = data.terraform_remote_state.networking.outputs.vpc_id
+  subnet_ids                   = data.terraform_remote_state.networking.outputs.public_subnet_ids
+  ecs_tasks_security_group_id  = data.terraform_remote_state.networking.outputs.ecs_tasks_security_group_id
+  
+  # Database desde p3-rds-postgres
+  db_host = data.terraform_remote_state.rds.outputs.db_host
+  
+  # Target Groups desde p3-alb-target-groups
+  blue_target_group_name  = data.terraform_remote_state.networking.outputs.blue_target_group_name
+  green_target_group_name = data.terraform_remote_state.networking.outputs.green_target_group_name
+  alb_name                = data.terraform_remote_state.networking.outputs.alb_summary.alb.name
+}
+
 # 4. ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-${var.environment}-cluster"
@@ -162,7 +195,7 @@ resource "aws_ecs_task_definition" "app" {
         },
         {
           name  = "DB_HOST"
-          value = var.db_host
+          value = local.db_host
         },
         {
           name  = "DB_PORT"
@@ -195,9 +228,17 @@ resource "aws_ecs_task_definition" "app" {
 }
 
 # 9. Data Sources - Target Groups
-# Data sources para Target Groups
+# Data sources para Target Groups usando remote state
 data "aws_lb_target_group" "blue" {
-  name = "${var.project_name}-${var.environment}-blue-tg"
+  name = local.blue_target_group_name
+}
+
+data "aws_lb_target_group" "green" {
+  name = local.green_target_group_name
+}
+
+data "aws_lb" "main" {
+  name = local.alb_name
 }
 
 # 10. Servicio ECS
@@ -209,8 +250,8 @@ resource "aws_ecs_service" "app" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = var.subnet_ids
-    security_groups  = [var.ecs_tasks_security_group_id]
+    subnets          = local.subnet_ids
+    security_groups  = [local.ecs_tasks_security_group_id]
     assign_public_ip = true
   }
 
@@ -256,14 +297,6 @@ resource "aws_codedeploy_app" "app" {
 # Data sources para CodeDeploy
 data "aws_iam_role" "codedeploy" {
   name = "${var.project_name}-${var.environment}-codedeploy-role"
-}
-
-data "aws_lb_target_group" "green" {
-  name = "${var.project_name}-${var.environment}-green-tg"
-}
-
-data "aws_lb" "main" {
-  name = "${var.project_name}-${var.environment}-alb"
 }
 
 data "aws_lb_listener" "production" {

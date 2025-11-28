@@ -80,10 +80,7 @@ variable "db_name" {
   default     = "dbdevops"
 }
 
-variable "db_host" {
-  description = "Host de la base de datos"
-  type        = string
-}
+# Nota: db_host se obtiene dinámicamente desde p3-rds-postgres via terraform_remote_state
 
 variable "db_port" {
   description = "Puerto de la base de datos"
@@ -91,21 +88,8 @@ variable "db_port" {
   default     = 5432
 }
 
-# Variables de Networking (desde Paso 3)
-variable "vpc_id" {
-  description = "ID de la VPC"
-  type        = string
-}
-
-variable "subnet_ids" {
-  description = "IDs de las subnets públicas"
-  type        = list(string)
-}
-
-variable "ecs_tasks_security_group_id" {
-  description = "ID del Security Group de ECS Tasks"
-  type        = string
-}
+# Nota: vpc_id, subnet_ids, ecs_tasks_security_group_id se obtienen dinámicamente
+# desde p3-alb-target-groups via terraform_remote_state
 
 # Variables de ECS Service
 variable "desired_count" {
