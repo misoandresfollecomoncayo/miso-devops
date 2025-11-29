@@ -175,21 +175,33 @@ clean_terraform_state() {
 empty_s3_bucket() {
     log_step "Vaciando bucket S3 de CodePipeline"
     
-    # Obtener account ID dinámicamente
-    local account_id=$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo "148342400171")
-    local bucket_name="python-app-dev-pipeline-artifacts-${account_id}"
+    # Obtener account ID con timeout
+    log "Obteniendo Account ID..."
+    local account_id
+    account_id=$(timeout 5 aws sts get-caller-identity --query Account --output text 2>/dev/null)
     
-    # Verificar si el bucket existe
-    if aws s3api head-bucket --bucket "$bucket_name" --region us-east-1 2>/dev/null; then
+    if [ -z "$account_id" ] || [ $? -ne 0 ]; then
+        log_warning "No se pudo obtener Account ID, usando ID hardcodeado"
+        account_id="148342400171"
+    fi
+    
+    local bucket_name="python-app-dev-pipeline-artifacts-${account_id}"
+    log "Buscando bucket: $bucket_name"
+    
+    # Verificar si el bucket existe con timeout
+    if timeout 10 aws s3api head-bucket --bucket "$bucket_name" --region us-east-1 2>/dev/null; then
         log "Bucket encontrado: $bucket_name"
-        log "Eliminando objetos..."
+        log "Eliminando objetos (puede tardar unos segundos)..."
         
-        # Método simple sin loops complejos
-        aws s3 rm "s3://${bucket_name}" --recursive --region us-east-1 2>&1 | head -20 | tee -a "$LOG_FILE" || true
+        # Eliminar objetos con timeout de 2 minutos
+        timeout 120 aws s3 rm "s3://${bucket_name}" --recursive --region us-east-1 >> "$LOG_FILE" 2>&1 || {
+            log_warning "Timeout o error al vaciar bucket, continuando..."
+            return 0
+        }
         
         log "[OK] Bucket S3 vaciado"
     else
-        log_warning "Bucket S3 no encontrado, saltando..."
+        log_warning "Bucket S3 no encontrado o inaccesible, saltando..."
     fi
 }
 
