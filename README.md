@@ -167,3 +167,5 @@ El despliegue se realiza automáticamente mediante CodePipeline al hacer push a 
 
 - [Entrega 1](https://drive.google.com/file/d/1zjUT5zi4UIbPUqDhEecvAmYlLivAYw3X/view?usp=sharing)
 - [Entrega 2](https://drive.google.com/file/d/1sy7MgLiJfn93papLaZSNCYN77NrFEXWr/view?usp=sharing)
+- [Entrega 3](https://drive.google.com/file/d/1GLwRaL_K6Oos9uEQPE2T43k6Qdg8ZAGS/view?usp=sharing)
+- [Entrega 4](https://drive.google.com/file/d/1Y0-KEg-MPetzZVKL-FUvUvg2VkjJGCVy/view?usp=sharing)
